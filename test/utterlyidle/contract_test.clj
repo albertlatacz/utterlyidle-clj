@@ -1,0 +1,58 @@
+(ns utterlyidle.contract_test
+  (:use clojure.test
+        utterlyidle.bindings
+        [utterlyidle.server :as server]
+        [utterlyidle.client :as client]
+        )
+  (:refer-clojure :exclude (get))
+
+(defn test-server [f]
+  (def testServer
+    (server/start 9000
+      (bindings-in-namespace 'utterlyidle.contract_test)))
+  (f)
+  (.close testServer))
+
+(use-fixtures :once test-server)
+
+(defn test-url [path]
+  (str "http://localhost:9000" path))
+
+
+
+
+(defresource get-binding-with-parameter [:get "/get-with-query-param"] {:query-params [param]}
+  (str "GET " param))
+
+(deftest supports-get-with-parameters
+  (let [path "/get-with-query-param"]
+    (is (= (:body (client/get (test-url path) {:param "Hello there"})) "GET Hello there"))))
+
+
+
+(defresource get-binding-without-parameter [:get "/get-without-param"] {}
+  (str "GET"))
+
+(deftest supports-get-without-parameters
+  (let [path "/get-without-param"]
+    (is (= (:body (client/get (test-url path))) "GET"))))
+
+
+
+(defresource post-binding-with-form-parameter [:post "/post-with-form-param"] {:form-params [param]}
+  (str "POST " param))
+
+(deftest supports-post-with-form-parameters
+  (let [path "/post-with-form-param"]
+    (is (= (:body (client/post (test-url path) {:param "Hello there"})) "POST Hello there"))))
+
+
+
+(defresource binding-with-different-parameters [:get "/binding-with-different-parameters/{path-param}"]
+  {:query-params [query-param]
+   :path-params [path-param]}
+  (str "GET " query-param " " path-param))
+
+(deftest supports-different-parameters
+  (let [path "/binding-with-different-parameters/there"]
+    (is (= (:body (client/get (test-url path) {:query-param "Hello"})) "GET Hello there"))))
