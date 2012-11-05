@@ -1,0 +1,14 @@
+utterlyidle-clj
+===============
+
+[![Build Status](https://secure.travis-ci.org/albertlatacz/utterlyidle-clj.png)](http://travis-ci.org/albertlatacz/utterlyidle-clj)
+
+utterlyidle-clj is a library for representing of Clojure bindings for utterlyidle REST framework.
+
+
+License
+=======
+
+Copyright (C) 2012 Albert Latacz
+
+Distributed under the Eclipse Public License, the same as Clojure.
