@@ -11,10 +11,12 @@
            [com.googlecode.utterlyidle.modules Modules Module]
            [com.googlecode.totallylazy Pair]))
 
-(defn start [port bindings]
-  (let [conf (. (ServerConfiguration/defaultConfiguration) port port)
-        app (proxy [RestApplication] [(BasePath/basePath "/")])]
-    (.add app
-      (Modules/bindingsModule
-        (into-array ^Binding (map fn-to-binding bindings))))
-    (RestServer. app conf)))
+(defn start
+  ([port bindings] (start port "/" bindings))
+  ([port base-path bindings]
+    (let [conf (. (ServerConfiguration/defaultConfiguration) port port)
+          app (proxy [RestApplication] [(BasePath/basePath base-path)])]
+      (.add app
+        (Modules/bindingsModule
+          (into-array ^Binding (map fn-to-binding bindings))))
+      (RestServer. app conf))))

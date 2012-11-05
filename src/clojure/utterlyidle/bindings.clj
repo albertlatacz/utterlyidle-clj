@@ -31,7 +31,7 @@
     (mapcat bindings-in-namespace namespaces)))
 
 
-(defn bind-resource [method path query-params form-params path-params header-params cookie-params func]
+(defn bind-resource [method path query-params form-params path-params header-params cookie-params request-param func]
   (with-meta func (assoc (meta func)
                     :utterlyidle-binding true
                     :utterlyidle-method method
@@ -41,6 +41,7 @@
                     :utterlyidle-path-params path-params
                     :utterlyidle-header-params header-params
                     :utterlyidle-cookie-params cookie-params
+                    :utterlyidle-request-param request-param
                     )))
 
 (defn parse-args [args]
@@ -52,6 +53,7 @@
    :path-params (:path-params (nth args 2))
    :header-params (:header-params (nth args 2))
    :cookie-params (:cookie-params (nth args 2))
+   :request-param (or (:as (nth args 2) 'request))
    :body (drop 3 args)
    })
 
@@ -89,7 +91,7 @@
     (ui-binding
       (:utterlyidle-method binding-meta)
       (:utterlyidle-path binding-meta)
-      ["text/plain" "application/x-www-form-urlencoded"]
+      ["text/plain" "application/x-www-form-urlencoded" "application/xml"]
       ["text/html"]
       (params-from-binding binding)
       binding)))
@@ -99,9 +101,17 @@
 
 
 (defmacro defresource [& args]
-  (let [{:keys [fn-name method path query-params form-params path-params header-params cookie-params body]} (parse-args args)]
-    `(defn ~(bind-resource method path (names query-params) (names form-params) (names path-params) (names header-params) (names cookie-params)
-              fn-name) ~(vec (concat query-params form-params path-params header-params cookie-params))
+  (let [{:keys [fn-name method path query-params form-params path-params header-params cookie-params request-param body]} (parse-args args)]
+    `(defn ~(bind-resource
+              method
+              path
+              (names query-params)
+              (names form-params)
+              (names path-params)
+              (names header-params)
+              (names cookie-params)
+              (name (quote request-param))
+              fn-name) ~(vec (concat [request-param] query-params form-params path-params header-params cookie-params))
        ~@body)))
 
 

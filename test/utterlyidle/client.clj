@@ -40,6 +40,9 @@
   (doseq [item params]
     (.. builder (form (name (key item)) (val item)))))
 
+(defn- with-request-body [body builder]
+  (.. builder (entity body)))
+
 (defn get
   ([url] (get url {}))
   ([url params]
@@ -48,4 +51,6 @@
 (defn post
   ([url] (post url {}))
   ([url params]
-    (make-request "POST" url (partial with-form-params params) {:contentType "application/x-www-form-urlencoded"})))
+    (make-request "POST" url (partial with-form-params params) {:contentType "application/x-www-form-urlencoded"}))
+  ([url content-type body]
+    (make-request "POST" url (partial with-request-body body) {:contentType content-type})))

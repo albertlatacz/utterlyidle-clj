@@ -32,7 +32,7 @@ public class ClojureBinding {
     }
 
     private static Sequence<Pair<Type, Option<Parameter>>> dispatchMethodParameters(IFn function, Pair<Type, Option<Parameter>>[] params) {
-        return sequence(functionParam(function))
+        return sequence(functionParam(function), requestParam())
                 .join(sequence(params));
     }
 
@@ -60,11 +60,15 @@ public class ClojureBinding {
         return Pair.pair((Type) IFn.class, Option.<Parameter>some(new DefinedParameter<IFn>(IFn.class, value)));
     }
 
+    private static Pair<Type, Option<Parameter>> requestParam() {
+        return Pair.pair((Type) Request.class, Option.<Parameter>none());
+    }
+
     private static Method dispatchMethod() {
         return method(on(ClojureBinding.class).invoke()).method();
     }
 
     public Object invoke(Object... params) {
-        return invokeInstanceMember("invoke", params[0], sequence(params).drop(1).toArray(Object.class));
+        return invokeInstanceMember("invoke", params[0], sequence(params).drop(2).cons(((Request) params[1]).entity().toString()).toArray(Object.class));
     }
 }

@@ -18,7 +18,7 @@
         (functions-in-namespace 'utterlyidle.testdata.bindings))))
 
 (deftest binds-function-correctly
-(let [binded-resource (bind-resource :post "/test" ["query-param"] ["form-param"] ["path-param"] ["header-param"] ["cookie-param"] (fn[name] ""))]
+(let [binded-resource (bind-resource :post "/test" ["query-param"] ["form-param"] ["path-param"] ["header-param"] ["cookie-param"] "request" (fn[name] ""))]
   (is (binding? binded-resource))
   (is (= (meta binded-resource)
         {:utterlyidle-binding true
@@ -29,5 +29,6 @@
          :utterlyidle-path-params ["path-param"]
          :utterlyidle-cookie-params ["cookie-param"]
          :utterlyidle-header-params ["header-param"]
+         :utterlyidle-request-param "request"
          }))))
 

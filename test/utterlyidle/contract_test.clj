@@ -4,11 +4,11 @@
         [utterlyidle.server :as server]
         [utterlyidle.client :as client]
         )
-  (:refer-clojure :exclude (get))
+  (:refer-clojure :exclude (get)))
 
 (defn test-server [f]
   (def testServer
-    (server/start 9000
+    (server/start 9000 "/test-server"
       (bindings-in-namespace 'utterlyidle.contract_test)))
   (f)
   (.close testServer))
@@ -16,7 +16,7 @@
 (use-fixtures :once test-server)
 
 (defn test-url [path]
-  (str "http://localhost:9000" path))
+  (str "http://localhost:9000/test-server" path))
 
 
 
@@ -45,6 +45,14 @@
 (deftest supports-post-with-form-parameters
   (let [path "/post-with-form-param"]
     (is (= (:body (client/post (test-url path) {:param "Hello there"})) "POST Hello there"))))
+
+
+(defresource post-binding-with-body [:post "/post-with-body"] {:as request}
+  (str "POST " request))
+
+(deftest supports-post-with-body
+  (let [path "/post-with-body"]
+    (is (= (:body (client/post  (test-url path) "application/xml" "<helloThere/>")) "POST <helloThere/>"))))
 
 
 
