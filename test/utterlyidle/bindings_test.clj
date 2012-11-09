@@ -18,17 +18,18 @@
         (functions-in-namespace 'utterlyidle.testdata.bindings))))
 
 (deftest binds-function-correctly
-(let [binded-resource (bind-resource :post "/test" ["query-param"] ["form-param"] ["path-param"] ["header-param"] ["cookie-param"] "request" (fn[name] ""))]
-  (is (binding? binded-resource))
-  (is (= (meta binded-resource)
-        {:utterlyidle-binding true
-         :utterlyidle-method :post
-         :utterlyidle-path "/test"
-         :utterlyidle-query-params ["query-param"]
-         :utterlyidle-form-params ["form-param"]
-         :utterlyidle-path-params ["path-param"]
-         :utterlyidle-cookie-params ["cookie-param"]
-         :utterlyidle-header-params ["header-param"]
-         :utterlyidle-request-param "request"
-         }))))
+  (let [binded-resource (bind-resource :post "/test" ["consumes"] ["produces"] ["query-param"] ["form-param"] ["path-param"] ["header-param"] ["cookie-param"] "request" (fn [name] ""))]
+    (is (binding? binded-resource))
+    (is (= (meta binded-resource)
+          {:utterlyidle {:method :post
+                         :path "/test"
+                         :query-params ["query-param"]
+                         :form-params ["form-param"]
+                         :path-params ["path-param"]
+                         :cookie-params ["cookie-param"]
+                         :header-params ["header-param"]
+                         :request-param "request"
+                         :consumes ["consumes"]
+                         :produces ["produces"]
+                         }}))))
 
