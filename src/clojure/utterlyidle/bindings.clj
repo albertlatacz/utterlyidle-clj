@@ -1,7 +1,6 @@
 (ns utterlyidle.bindings
   (:use clojure.tools.namespace
-        [clojure.java.io :only [file]]
-        [clojure.core.match :only [match]])
+        [clojure.java.io :only [file]])
 
   (:import [utterlyidle ClojureBinding]
            [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration UriTemplate]
@@ -23,19 +22,31 @@
 (defn binding? [func]
   (:utterlyidle (meta func)))
 
-(defn bindings-in-namespace [ns]
+(defn with-resources-in-ns [ns]
   (filter binding? (functions-in-namespace ns)))
 
-(defn bindings-in-dir [dir]
+(defn with-resources-in-dir [dir]
   (let [namespaces (find-namespaces-in-dir (file dir))]
     (require-all namespaces)
-    (mapcat bindings-in-namespace namespaces)))
+    (mapcat with-resources-in-ns namespaces)))
+
+(defn fn->args [form]
+  (let [form-sym (first form)]
+    (if (and (symbol? form-sym) (= 'fn form-sym))
+      (list (second form)))))
+
+(defmacro extract-args [form]
+  (if (symbol? form)
+    (mapv #(mapv name %) (:arglists (meta (resolve form))))
+    (mapv #(mapv name %) (fn->args form))
+    ))
 
 
-(defn bind-resource [method path consumes produces query-params form-params path-params header-params cookie-params request-param func]
+(defn with-binding-meta [method path consumes produces query-params form-params path-params header-params cookie-params request-param func args]
   (with-meta func
     (assoc (meta func)
-      :utterlyidle {:method method
+      :utterlyidle {:arguments args
+                    :method method
                     :path path
                     :consumes consumes
                     :produces produces
@@ -47,7 +58,6 @@
                     :request-param request-param
                     }
       )))
-
 
 (defn- consumes-for-method [method]
   (cond
@@ -90,50 +100,47 @@
 (defn path-param [name]
   (ClojureBinding/pathParam name))
 
-
-(defn ui-binding [method path consumes produces params function]
-  (ClojureBinding/binding path (. (name method) toUpperCase) (into-array String consumes) (into-array String produces) function (into-array Pair params)))
-
 (defn params-from-binding [binding]
-  (let [binding-meta (:utterlyidle (meta binding))]
-    (concat
-      (map query-param (:query-params binding-meta))
-      (map form-param (:form-params binding-meta))
-      (map cookie-param (:cookie-params binding-meta))
-      (map header-param (:header-params binding-meta))
-      (map path-param (:path-params binding-meta))
-      )))
+  (concat
+    (map query-param (:query-params binding))
+    (map form-param (:form-params binding))
+    (map cookie-param (:cookie-params binding))
+    (map header-param (:header-params binding))
+    (map path-param (:path-params binding))
+    ))
+
 
 (defn fn-to-binding [binding]
   (let [binding-meta (:utterlyidle (meta binding))]
-    (ui-binding
-      (:method binding-meta)
+    (ClojureBinding/binding
       (:path binding-meta)
-      (:consumes binding-meta)
-      (:produces binding-meta)
-      (params-from-binding binding)
-      binding)))
+      (. (name (:method binding-meta)) toUpperCase)
+      (into-array String (:consumes binding-meta))
+      (into-array String (:produces binding-meta))
+      binding
+      (into-array Pair (params-from-binding binding-meta)))))
 
-(defn- names [params]
-  (vec (map name params)))
-
+(defmacro with-resource [method path consumes produces params function]
+  `(with-binding-meta ~method ~path ~consumes ~produces (:query-params ~params) (:form-params ~params) (:path-params ~params) (:header-params ~params) (:cookie-params ~params) (:request-param ~params) ~function (extract-args ~function)))
 
 (defmacro defresource [& args]
-  (let [{:keys [fn-name method path consumes produces query-params form-params path-params header-params cookie-params request-param body]} (parse-args args)]
+  (let [{:keys [fn-name method path consumes produces query-params form-params path-params header-params cookie-params request-param body]} (parse-args args)
+        fn-params (concat [request-param] query-params form-params path-params header-params cookie-params)]
     `(defn
-       ~(bind-resource
+       ~(with-binding-meta
           method
           path
           consumes
           produces
-          (names query-params)
-          (names form-params)
-          (names path-params)
-          (names header-params)
-          (names cookie-params)
-          (name (quote request-param))
-          fn-name)
-       ~(vec (concat [request-param] query-params form-params path-params header-params cookie-params))
+          (mapv name query-params)
+          (mapv name form-params)
+          (mapv name path-params)
+          (mapv name header-params)
+          (mapv name cookie-params)
+          (name request-param)
+          fn-name
+          [(mapv name fn-params)])
+       ~(vec fn-params)
        ~@body)))
 
 

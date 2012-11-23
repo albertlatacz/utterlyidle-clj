@@ -9,7 +9,7 @@
 (defn test-server [f]
   (def testServer
     (server/start 9000 "/test-server"
-      (bindings-in-namespace 'utterlyidle.contract_test)))
+      (with-resources-in-ns 'utterlyidle.contract_test)))
   (f)
   (.close testServer))
 

@@ -13,10 +13,10 @@
 
 (defn start
   ([port bindings] (start port "/" bindings))
-  ([port base-path bindings]
+  ([port base-path & bindings]
     (let [conf (. (ServerConfiguration/defaultConfiguration) port port)
           app (proxy [RestApplication] [(BasePath/basePath base-path)])]
       (.add app
         (Modules/bindingsModule
-          (into-array ^Binding (map fn-to-binding bindings))))
+          (into-array ^Binding (map fn-to-binding (flatten bindings)))))
       (RestServer. app conf))))
