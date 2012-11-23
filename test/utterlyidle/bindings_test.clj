@@ -18,26 +18,28 @@
         (functions-in-namespace 'utterlyidle.testdata.bindings))))
 
 (deftest check-resource-is-binded-correctly
-  (let [binded-resource (do (with-resource :get "/test" ["consumes"] ["produces"] {:query-params ["name"]} (fn [name] name)))]
+  (let [binded-resource (do (with-resource :get "/test" ["consumes"] ["produces"] {:query-params [name]} (fn [name] name)))]
     (is (binding? binded-resource))))
 
 (deftest binds-fn-correctly
-  (is (= (do (meta (with-resource :get "/test" ["consumes"] ["produces"] {:query-params ["name"]} (fn [name] name))))
-        {:utterlyidle {:arguments [["name"]]
+  (is (= (do (meta (with-resource :get "/test" ["consumes"] ["produces"]
+                     {:query-params [query-param] :form-params [form-param] :path-params [path-param] :cookie-params [cookie-param]
+                      :header-params [header-param] :as [request]} (fn [request name] name))))
+        {:utterlyidle {:arguments [["request" "name"]]
                        :method :get
                        :path "/test"
-                       :query-params ["name"]
-                       :form-params nil
-                       :path-params nil
-                       :cookie-params nil
-                       :header-params nil
-                       :request-param nil
+                       :query-params ["query-param"]
+                       :form-params ["form-param"]
+                       :path-params ["path-param"]
+                       :cookie-params ["cookie-param"]
+                       :header-params ["header-param"]
+                       :request-params ["request"]
                        :consumes ["consumes"]
                        :produces ["produces"]
                        }})))
 
 (defn test-resource [name] name)
 (deftest binds-var-correctly
-  (is (= (:arguments (:utterlyidle (do (meta (with-resource :get "/test" ["consumes"] ["produces"] {:query-params ["name"]} test-resource)))))
+  (is (= (:arguments (:utterlyidle (do (meta (with-resource :get "/test" ["consumes"] ["produces"] {:query-params [name]} test-resource)))))
         [["name"]])))
 

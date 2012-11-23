@@ -42,7 +42,7 @@
     ))
 
 
-(defn with-binding-meta [method path consumes produces query-params form-params path-params header-params cookie-params request-param func args]
+(defn with-binding-meta [method path consumes produces query-params form-params path-params header-params cookie-params request-params func args]
   (with-meta func
     (assoc (meta func)
       :utterlyidle {:arguments args
@@ -55,7 +55,7 @@
                     :path-params path-params
                     :header-params header-params
                     :cookie-params cookie-params
-                    :request-param request-param
+                    :request-params request-params
                     }
       )))
 
@@ -79,39 +79,28 @@
      :path-params (:path-params (nth args 2))
      :header-params (:header-params (nth args 2))
      :cookie-params (:cookie-params (nth args 2))
-     :request-param (or (:as (nth args 2) 'request))
+     :request-params (vec (:as (nth args 2)))
      :consumes (or (:consumes (nth args 2)) (consumes-for-method method))
      :produces (or (:produces (nth args 2)) (produces-for-method method))
      :body (drop 3 args)
      }))
 
-(defn form-param [name]
-  (ClojureBinding/formParam name))
-
-(defn query-param [name]
-  (ClojureBinding/queryParam name))
-
-(defn cookie-param [name]
-  (ClojureBinding/cookieParam name))
-
-(defn header-param [name]
-  (ClojureBinding/headerParam name))
-
-(defn path-param [name]
-  (ClojureBinding/pathParam name))
-
 (defn params-from-binding [binding]
-  (concat
-    (map query-param (:query-params binding))
-    (map form-param (:form-params binding))
-    (map cookie-param (:cookie-params binding))
-    (map header-param (:header-params binding))
-    (map path-param (:path-params binding))
-    ))
+  (let [{:keys [query-params form-params cookie-params header-params path-params request-params]} binding]
+    (mapv
+      (fn [arg]
+        (cond
+          (some #(= arg %) request-params) (ClojureBinding/requestParam)
+          (some #(= arg %) query-params) (ClojureBinding/queryParam arg)
+          (some #(= arg %) form-params) (ClojureBinding/formParam arg)
+          (some #(= arg %) cookie-params) (ClojureBinding/cookieParam arg)
+          (some #(= arg %) header-params) (ClojureBinding/headerParam arg)
+          (some #(= arg %) path-params) (ClojureBinding/pathParam arg)))
+      (first (:arguments binding)))))
 
-
-(defn fn-to-binding [binding]
+(defn fn->binding [binding]
   (let [binding-meta (:utterlyidle (meta binding))]
+    (prn binding-meta)
     (ClojureBinding/binding
       (:path binding-meta)
       (. (name (:method binding-meta)) toUpperCase)
@@ -121,11 +110,24 @@
       (into-array Pair (params-from-binding binding-meta)))))
 
 (defmacro with-resource [method path consumes produces params function]
-  `(with-binding-meta ~method ~path ~consumes ~produces (:query-params ~params) (:form-params ~params) (:path-params ~params) (:header-params ~params) (:cookie-params ~params) (:request-param ~params) ~function (extract-args ~function)))
+  (let [{:keys [query-params form-params path-params header-params cookie-params as]} params]
+    `(with-binding-meta
+       ~method
+       ~path
+       ~consumes
+       ~produces
+       ~(mapv name query-params)
+       ~(mapv name form-params)
+       ~(mapv name path-params)
+       ~(mapv name header-params)
+       ~(mapv name cookie-params)
+       ~(mapv name as)
+       ~function
+       (extract-args ~function))))
 
 (defmacro defresource [& args]
-  (let [{:keys [fn-name method path consumes produces query-params form-params path-params header-params cookie-params request-param body]} (parse-args args)
-        fn-params (concat [request-param] query-params form-params path-params header-params cookie-params)]
+  (let [{:keys [fn-name method path consumes produces query-params form-params path-params header-params cookie-params request-params body]} (parse-args args)
+        fn-params (concat request-params query-params form-params path-params header-params cookie-params)]
     `(defn
        ~(with-binding-meta
           method
@@ -137,7 +139,7 @@
           (mapv name path-params)
           (mapv name header-params)
           (mapv name cookie-params)
-          (name request-param)
+          (mapv name request-params)
           fn-name
           [(mapv name fn-params)])
        ~(vec fn-params)

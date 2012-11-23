@@ -18,5 +18,5 @@
           app (proxy [RestApplication] [(BasePath/basePath base-path)])]
       (.add app
         (Modules/bindingsModule
-          (into-array ^Binding (map fn-to-binding (flatten bindings)))))
+          (into-array ^Binding (map fn->binding (flatten bindings)))))
       (RestServer. app conf))))

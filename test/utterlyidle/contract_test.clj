@@ -47,8 +47,8 @@
     (is (= (:body (client/post (test-url path) {:param "Hello there"})) "POST Hello there"))))
 
 
-(defresource post-binding-with-body [:post "/post-with-body"] {:as request}
-  (str "POST " request))
+(defresource post-binding-with-body [:post "/post-with-body"] {:as [request]}
+  (str "POST " (.entity request)))
 
 (deftest supports-post-with-body
   (let [path "/post-with-body"]
