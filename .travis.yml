@@ -1,4 +1,5 @@
 language: clojure
 script:
+    - lein plugin install lein-clojars 0.9.1
     - lein test
-    - ls ~/.ssh/
+    - lein push
