@@ -1,4 +1,4 @@
-(defproject utterlyidle-clj "1.0.0-SNAPSHOT"
+(defproject utterlyidle-clj "1.0.0"
     :description "Clojure bindings for UtterlyIdle"
     :source-path "src/clojure"
     :java-source-path "src/java"
