@@ -1,6 +1,6 @@
 (ns utterlyidle.example.restServer
   (:use clojure.tools.namespace
-        utterlyidle.bindings
+        utterlyidle.core
         utterlyidle.server
         [clojure.java.io :only [file]]))
 

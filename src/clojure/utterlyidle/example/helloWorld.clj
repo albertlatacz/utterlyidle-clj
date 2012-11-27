@@ -2,7 +2,7 @@
   (:use clojure.tools.namespace
         [clojure.java.io :only [file]]
         utterlyidle.server
-        utterlyidle.bindings
+        utterlyidle.core
         ))
 
 (defresource test-binding [:get "/test-binding"] {}

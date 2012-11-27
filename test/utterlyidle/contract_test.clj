@@ -1,6 +1,6 @@
 (ns utterlyidle.contract_test
   (:use clojure.test
-        utterlyidle.bindings
+        utterlyidle.core
         [utterlyidle.server :as server]
         [utterlyidle.client :as client]
         )

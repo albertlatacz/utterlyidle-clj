@@ -1,4 +1,4 @@
-(ns utterlyidle.bindings
+(ns utterlyidle.core
   (:use clojure.tools.namespace
         [clojure.java.io :only [file]])
 
@@ -69,6 +69,11 @@
     (= method :get ) ["text/html"]
     (= method :post ) ["text/html"]))
 
+(defn- as-request [request]
+  {:body (.entity request)
+   :method (.method request)
+   :uri (.. request (uri) (toString))})
+
 (defn parse-args [args]
   (let [method (nth (nth args 1) 0)]
     {:fn-name (nth args 0)
@@ -90,17 +95,16 @@
     (mapv
       (fn [arg]
         (cond
-          (some #(= arg %) request-params) (ClojureBinding/requestParam)
-          (some #(= arg %) query-params) (ClojureBinding/queryParam arg)
-          (some #(= arg %) form-params) (ClojureBinding/formParam arg)
-          (some #(= arg %) cookie-params) (ClojureBinding/cookieParam arg)
-          (some #(= arg %) header-params) (ClojureBinding/headerParam arg)
-          (some #(= arg %) path-params) (ClojureBinding/pathParam arg)))
+          (some #{arg} request-params) (ClojureBinding/requestParam)
+          (some #{arg} query-params) (ClojureBinding/queryParam arg)
+          (some #{arg} form-params) (ClojureBinding/formParam arg)
+          (some #{arg} cookie-params) (ClojureBinding/cookieParam arg)
+          (some #{arg} header-params) (ClojureBinding/headerParam arg)
+          (some #{arg} path-params) (ClojureBinding/pathParam arg)))
       (first (:arguments binding)))))
 
 (defn fn->binding [binding]
   (let [binding-meta (:utterlyidle (meta binding))]
-    (prn binding-meta)
     (ClojureBinding/binding
       (:path binding-meta)
       (. (name (:method binding-meta)) toUpperCase)

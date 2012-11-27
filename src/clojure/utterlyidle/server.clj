@@ -1,8 +1,7 @@
 (ns utterlyidle.server
-  (:use clojure.tools.namespace
-        [clojure.java.io :only [file]]
-        utterlyidle.bindings
-        )
+  (:use utterlyidle.core
+        clojure.tools.namespace
+        [clojure.java.io :only [file]])
 
   (:import [utterlyidle ClojureBinding]
            [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration UriTemplate]

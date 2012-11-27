@@ -1,6 +1,6 @@
-(ns utterlyidle.bindings_test
+(ns utterlyidle.core_test
   (:use clojure.test
-        utterlyidle.bindings
+        utterlyidle.core
         utterlyidle.testdata.bindings
         utterlyidle.testdata.subns.bindings_in_subns
         ))
