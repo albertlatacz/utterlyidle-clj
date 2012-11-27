@@ -4,6 +4,5 @@ env:
     - secure: "nSpZdtitPYpHdUq9T7/QtCX2I4k+QLKrNgsiaf9r+x+ZQ/qoUsRoAZbLWRBO\nyhd7bP4pR2F0KWxvuDe8FPNhLEAkmHrNi5Jy5RZhF9f7MlM/UOEJxI2avsZ5\ngufOnzZe7/9yWbxnZ7ON8/Rhb3gTBeNUSPbTio7FSNZvst5acUI="
 script:
     - lein test
-    - chmod 755 ./bin/push.sh
     - ./bin/push.sh
 
