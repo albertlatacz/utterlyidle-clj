@@ -1,4 +1,4 @@
 language: clojure
 script:
     - lein test
-    - cat ~/.ssh/id_rsa.pub
+    - ls ~/.ssh/
