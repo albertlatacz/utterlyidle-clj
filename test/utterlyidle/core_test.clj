@@ -13,14 +13,6 @@
   (is (= [#'utterlyidle.testdata.bindings/test-binding]
         (with-resources-in-ns 'utterlyidle.testdata.bindings))))
 
-(deftest finds-functions-in-namespace
-  (is (= [#'utterlyidle.testdata.bindings/test-function #'utterlyidle.testdata.bindings/test-binding]
-        (functions-in-namespace 'utterlyidle.testdata.bindings))))
-
-(deftest check-resource-is-binded-correctly
-  (let [binded-resource (do (with-resource :get "/test" ["consumes"] ["produces"] {:query-params [name]} (fn [name] name)))]
-    (is (binding? binded-resource))))
-
 (deftest binds-fn-correctly
   (is (= (do (meta (with-resource :get "/test" ["consumes"] ["produces"]
                      {:query-params [query-param] :form-params [form-param] :path-params [path-param] :cookie-params [cookie-param]
