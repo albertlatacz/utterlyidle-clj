@@ -9,11 +9,11 @@
   :plugins [[codox "0.6.3"]]
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/tools.namespace "0.1.0"]
-                 [com.googlecode.utterlyidle/utterlyidle "558"]
+                 [com.googlecode.utterlyidle/utterlyidle "596"]
                  [com.googlecode.lazyrecords/lazyrecords "104"]
                  ;                 [hiccup "0.3.6"]
                  ]
   :dev-dependencies [[codox "0.4.0"]]
   :main utterlyidle.example.restServer
-  ;  :aot utterlyidle
+  :aot [utterlyidle.example.restServer]
   )

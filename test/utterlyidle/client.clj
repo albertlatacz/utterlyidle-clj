@@ -2,7 +2,7 @@
   (:use clojure.tools.namespace
         [clojure.java.io :only [file]])
 
-  (:import [utterlyidle ClojureBinding]
+  (:import [utterlyidle InvokeClojureResourceMethod]
            [com.googlecode.utterlyidle RequestBuilder Binding BasePath RestApplication ServerConfiguration UriTemplate]
            [com.googlecode.utterlyidle.httpserver RestServer]
            [com.googlecode.utterlyidle.dsl DslBindings BindingBuilder]

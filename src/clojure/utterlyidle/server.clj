@@ -3,7 +3,7 @@
         clojure.tools.namespace
         [clojure.java.io :only [file]])
 
-  (:import [utterlyidle ClojureBinding]
+  (:import [utterlyidle InvokeClojureResourceMethod]
            [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration UriTemplate]
            [com.googlecode.utterlyidle.httpserver RestServer]
            [com.googlecode.utterlyidle.dsl DslBindings BindingBuilder]
@@ -15,17 +15,17 @@
     (mapv
       (fn [arg]
         (cond
-          (some #{arg} request-params) (ClojureBinding/requestParam)
-          (some #{arg} query-params) (ClojureBinding/queryParam arg)
-          (some #{arg} form-params) (ClojureBinding/formParam arg)
-          (some #{arg} cookie-params) (ClojureBinding/cookieParam arg)
-          (some #{arg} header-params) (ClojureBinding/headerParam arg)
-          (some #{arg} path-params) (ClojureBinding/pathParam arg)))
+          (some #{arg} request-params) (InvokeClojureResourceMethod/requestParam)
+          (some #{arg} query-params) (InvokeClojureResourceMethod/queryParam arg)
+          (some #{arg} form-params) (InvokeClojureResourceMethod/formParam arg)
+          (some #{arg} cookie-params) (InvokeClojureResourceMethod/cookieParam arg)
+          (some #{arg} header-params) (InvokeClojureResourceMethod/headerParam arg)
+          (some #{arg} path-params) (InvokeClojureResourceMethod/pathParam arg)))
       (first (:arguments binding)))))
 
 (defn- fn->binding [binding]
   (let [binding-meta (:utterlyidle (meta binding))]
-    (ClojureBinding/binding
+    (InvokeClojureResourceMethod/binding
       (:path binding-meta)
       (. (name (:method binding-meta)) toUpperCase)
       (into-array String (:consumes binding-meta))

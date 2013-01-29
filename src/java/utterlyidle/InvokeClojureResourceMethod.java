@@ -13,37 +13,17 @@ import com.googlecode.utterlyidle.cookies.CookieParameters;
 import com.googlecode.utterlyidle.dsl.DefinedParameter;
 import com.googlecode.yadic.Container;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import static clojure.lang.Reflector.invokeInstanceMember;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.proxy.Call.method;
-import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.UriTemplate.uriTemplate;
 
 public class InvokeClojureResourceMethod implements Action {
-
     public static Binding binding(String path, String method, String[] consumes, String[] produces, IFn function, Pair<Type, Option<Parameter>>[] params) throws NoSuchMethodException {
         return new Binding(
-                new Action() {
-                    public Object invoke(Container container) throws Exception {
-                        Request request = container.get(Request.class);
-                        Application application = container.get(Application.class);
-                        Binding binding = container.get(MatchedBinding.class).value();
-                        Object[] params = new ParametersExtractor(binding.uriTemplate(), application, binding.parameters()).extract(request);
-                        return invokeInstanceMember("invoke", params[0], sequence(params).tail().toArray(Object.class));
-                    }
-
-                    public String description() {
-                        return toString();
-                    }
-
-                    public Iterable<ActionMetaData> metaData() {
-                        return Sequences.empty();
-                    }
-                },
+                dispatchAction(),
                 uriTemplate(path),
                 method,
                 sequence(consumes),
@@ -85,20 +65,23 @@ public class InvokeClojureResourceMethod implements Action {
         return Pair.pair((Type) Request.class, Option.<Parameter>none());
     }
 
+    private static Action dispatchAction() {
+        return new InvokeClojureResourceMethod();
+    }
 
-    public Object invoke(Object... params) {
+    public Object invoke(Container container) throws Exception {
+        Request request = container.get(Request.class);
+        Application application = container.get(Application.class);
+        Binding binding = container.get(MatchedBinding.class).value();
+        Object[] params = new ParametersExtractor(binding.uriTemplate(), application, binding.parameters()).extract(request);
         return invokeInstanceMember("invoke", params[0], sequence(params).tail().toArray(Object.class));
     }
 
     public String description() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public Object invoke(Container container) throws Exception {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return toString();
     }
 
     public Iterable<ActionMetaData> metaData() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return Sequences.empty();
     }
 }
