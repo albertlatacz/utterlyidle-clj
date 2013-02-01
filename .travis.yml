@@ -6,3 +6,4 @@ script:
     - lein test
     - ./bin/push.sh
 
+
