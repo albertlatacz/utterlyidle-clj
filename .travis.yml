@@ -1,7 +1,7 @@
 language: clojure
 env:
   global:
-    - secure: "nSpZdtitPYpHdUq9T7/QtCX2I4k+QLKrNgsiaf9r+x+ZQ/qoUsRoAZbLWRBO\nyhd7bP4pR2F0KWxvuDe8FPNhLEAkmHrNi5Jy5RZhF9f7MlM/UOEJxI2avsZ5\ngufOnzZe7/9yWbxnZ7ON8/Rhb3gTBeNUSPbTio7FSNZvst5acUI="
+    - secure: "G3qr4765V+TOdz2/h8QBUUyNm/2agiZLyXl6MejLTgoO4PcZiWS8vw8uIGIJ\nGXoikdcKczsy4xQGC3m+9N9XRCynTnrWaZu89alSAt/HIFr5eBGfQILrm7nd\neP05TG0IDlo30VmgxYMvwIuHflmKiRw+xyqS/gw2zJQutooPpyA="
 script:
     - lein test
     - ./bin/push.sh
