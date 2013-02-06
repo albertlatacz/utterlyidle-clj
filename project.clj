@@ -1,4 +1,6 @@
-(defproject utterlyidle-clj "1.0.0"
+(def build-number (or (System/getenv "UTTERLYIDLE_CLJ_BUILD_NUMBER") "DEV-SNAPSHOT"))
+
+(defproject utterlyidle-clj build-number
   :description "Clojure bindings for UtterlyIdle"
   :url "https://github.com/albertlatacz/utterlyidle-clj"
   :license {:name "Eclipse Public License"

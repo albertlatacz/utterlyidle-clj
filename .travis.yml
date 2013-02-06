@@ -2,6 +2,7 @@ language: clojure
 env:
   global:
     - secure: "PqtQetcQs/wBcrWxDN7OwSmI40YdmRA7uy3Za51B1ECQteR70GhUHr0lw4ej\nPF88vp1P8LT5+yBL7j+fS5iMfqrMKHMN037QNycawATSpe6fRRKImLzQIzWl\nELGawytxdNLLyBlR9K+aWZOevH6dYBxalGqMGw+aw/bUxNrEfaI="
+    - UTTERLYIDLE_CLJ_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
 script:
     - lein test
     - ./bin/push.sh
