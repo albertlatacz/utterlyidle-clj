@@ -5,17 +5,12 @@
   :url "https://github.com/albertlatacz/utterlyidle-clj"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :source-path "src/clojure"
-  :java-source-path "src/java"
+  :source-paths ["src/clojure"]
+  :java-source-paths ["src/java"]
   :repositories {"Dan Bodart" "http://repo.bodar.com.s3.amazonaws.com/"}
-  :plugins [[codox "0.6.3"]]
-  :dependencies [[org.clojure/clojure "1.4.0"]
+  :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/tools.namespace "0.1.0"]
-                 [com.googlecode.utterlyidle/utterlyidle "596"]
-                 [com.googlecode.lazyrecords/lazyrecords "104"]
-                 ;                 [hiccup "0.3.6"]
-                 ]
-  :dev-dependencies [[codox "0.4.0"]]
-  :main utterlyidle.example.restServer
-  :aot [utterlyidle.example.restServer]
+                 [com.googlecode.utterlyidle/utterlyidle "733"]]
+  :main utterlyidle.example.server
+  :aot [utterlyidle.example.server]
   )

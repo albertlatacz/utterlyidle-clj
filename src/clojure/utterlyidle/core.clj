@@ -35,8 +35,8 @@
 
 (defn- consumes-for-method [method]
   (cond
-    (= method :get ) ["text/plain"]
-    (= method :post ) ["text/plain" "application/x-www-form-urlencoded" "application/xml"]))
+    (= method :get ) ["*/*"]
+    (= method :post ) ["application/x-www-form-urlencoded" "application/xml"]))
 
 (defn- produces-for-method [method]
   (cond
@@ -115,8 +115,8 @@
        ~(with-binding
           method
           path
-          consumes
-          produces
+          (or consumes (consumes-for-method method))
+          (or produces (produces-for-method method))
           (mapv name query-params)
           (mapv name form-params)
           (mapv name path-params)

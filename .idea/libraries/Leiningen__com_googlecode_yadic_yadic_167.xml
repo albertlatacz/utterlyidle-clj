@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Leiningen: com.googlecode.yadic/yadic:167">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/yadic/yadic/167/yadic-167.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/yadic/yadic/167/yadic-167-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

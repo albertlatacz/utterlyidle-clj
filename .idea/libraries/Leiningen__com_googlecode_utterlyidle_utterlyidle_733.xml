@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Leiningen: com.googlecode.utterlyidle/utterlyidle:733">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/utterlyidle/utterlyidle/733/utterlyidle-733.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/utterlyidle/utterlyidle/733/utterlyidle-733-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/utterlyidle/utterlyidle/733/utterlyidle-733-test-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

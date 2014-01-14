@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Leiningen: com.googlecode.funclate/funclate:129">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/funclate/funclate/129/funclate-129.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/funclate/funclate/129/funclate-129-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -29,7 +29,7 @@ public class InvokeClojureResourceMethod implements Action {
                 sequence(consumes),
                 sequence(produces),
                 dispatchMethodParameters(function, params),
-                1, false);
+                1, false, null);
     }
 
     private static Sequence<Pair<Type, Option<Parameter>>> dispatchMethodParameters(IFn function, Pair<Type, Option<Parameter>>[] params) {
