@@ -10,8 +10,6 @@ install:
     - sudo apt-get install -qq s3cmd
 
 script:
-    - lein2 test
-    - lein2 uberjar
-    - ./bin/push.sh
+    - ./build.sh
 
 
