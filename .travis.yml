@@ -2,10 +2,16 @@ language: clojure
 lein: lein2
 env:
   global:
-    - secure: "PqtQetcQs/wBcrWxDN7OwSmI40YdmRA7uy3Za51B1ECQteR70GhUHr0lw4ej\nPF88vp1P8LT5+yBL7j+fS5iMfqrMKHMN037QNycawATSpe6fRRKImLzQIzWl\nELGawytxdNLLyBlR9K+aWZOevH6dYBxalGqMGw+aw/bUxNrEfaI="
+    - secure: "bM/ONh5WI7SdCKoBvU7zzsSXCdFn5BwrCX4FHtaLjQjwkAe7cxVER2cDD/CjTq3/rffnCedDaAmImjcTZRgT3gJZ5Ub4w5rtC6nU2KMSGT6vAvfbEN2X78d4VJo+eBpCrLlEJ3w52BC1iWdr8iuem1xPGK90al0qlCEqwevdgtY="
+    - secure: "fDZtNe3emhWZX9mW6OFG28Jv96EDtauCBUlCGrqM9FasusQ7829Tc1cQJ4dsNTN7OKxRZSlPxJDvTn4nc6x0hNmF9Q1qjzUIbKuBpPq/q5alQ5wrzmGR7JxE+KnN8ZL/KLumvTlQ2PlrITKf3+LYkGp//FzzM1U0E1HnE7G/C8U="
     - UTTERLYIDLE_CLJ_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
+
+install:
+    - sudo apt-get install -qq s3cmd
+
 script:
     - lein2 test
+    - lein2 uberjar
     - ./bin/push.sh
 
 

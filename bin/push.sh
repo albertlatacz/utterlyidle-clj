@@ -1,12 +1,16 @@
 #!/bin/bash
 
-echo "(def settings \
-      {:deploy-repositories \
-        {\"clojars-https\" \
-            {:url \"https://clojars.org/repo\" \
-             :username \"albertlatacz\" \
-             :password \"$CLOJARS_AUTH\"}}})" > ~/.lein/init.clj
+PROJECT_NAME=utterlyidle-clj
+PROJECT_VERSION=${UTTERLYIDLE_CLJ_BUILD_NUMBER}
+ARTEFACT=${PROJECT_NAME}-${UTTERLYIDLE_CLJ_BUILD_NUMBER}
 
-lein deploy clojars-https
+S3_CONFIG=~/.s3cfg
+echo "[default] \
+         access_key = ${AWS_KEY} \
+         secret_key = ${AWS_SECRET}" > ${S3_CONFIG}
 
-rm ~/.lein/init.clj
+s3cmd -c ${S3_CONFIG} put \
+    target/${ARTEFACT}.jar \
+    s3://albertlatacz.published/repo/${PROJECT_NAME}/${PROJECT_NAME}/${PROJECT_VERSION}/${ARTEFACT}.jar
+
+rm ${S3_CONFIG}
