@@ -5,9 +5,9 @@ PROJECT_VERSION=${UTTERLYIDLE_CLJ_BUILD_NUMBER}
 ARTEFACT=${PROJECT_NAME}-${PROJECT_VERSION}
 
 S3_CONFIG=~/.s3cfg
-echo "[default] \
-         access_key = ${AWS_KEY} \
-         secret_key = ${AWS_SECRET}" > ${S3_CONFIG}
+printf "[default]
+     access_key = ${AWS_KEY}
+     secret_key = ${AWS_SECRET}" > ${S3_CONFIG}
 
 s3cmd -c ${S3_CONFIG} put \
     target/${ARTEFACT}.jar \
