@@ -1,4 +1,5 @@
-*jar
+*.jar
+*.iml
 /pom.xml
 /.idea
 /lib
