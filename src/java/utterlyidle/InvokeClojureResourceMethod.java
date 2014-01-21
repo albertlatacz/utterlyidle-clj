@@ -38,23 +38,23 @@ public class InvokeClojureResourceMethod implements Action {
     }
 
     public static Pair<Type, Option<Parameter>> queryParam(String name) {
-        return Pair.pair((Type) String.class, Option.<Parameter>some(new NamedParameter(name, QueryParameters.class, option((String) null))));
+        return namedParameter(QueryParameters.class, name);
     }
 
     public static Pair<Type, Option<Parameter>> formParam(String name) {
-        return Pair.pair((Type) String.class, Option.<Parameter>some(new NamedParameter(name, FormParameters.class, option((String) null))));
+        return namedParameter(FormParameters.class, name);
     }
 
     public static Pair<Type, Option<Parameter>> cookieParam(String name) {
-        return Pair.pair((Type) String.class, Option.<Parameter>some(new NamedParameter(name, CookieParameters.class, option((String) null))));
+        return namedParameter(CookieParameters.class, name);
     }
 
     public static Pair<Type, Option<Parameter>> headerParam(String name) {
-        return Pair.pair((Type) String.class, Option.<Parameter>some(new NamedParameter(name, HeaderParameters.class, option((String) null))));
+        return namedParameter(HeaderParameters.class, name);
     }
 
     public static Pair<Type, Option<Parameter>> pathParam(String name) {
-        return Pair.pair((Type) String.class, Option.<Parameter>some(new NamedParameter(name, PathParameters.class, option((String) null))));
+        return namedParameter(PathParameters.class, name);
     }
 
     private static Pair<Type, Option<Parameter>> functionParam(IFn value) {
@@ -67,6 +67,10 @@ public class InvokeClojureResourceMethod implements Action {
 
     private static Action dispatchAction() {
         return new InvokeClojureResourceMethod();
+    }
+
+    private static Pair<Type, Option<Parameter>> namedParameter(Class<? extends Parameters<String, String, ?>> parametersClass, String name) {
+        return Pair.pair((Type) String.class, Option.<Parameter>some(new NamedParameter(name, parametersClass, option((String) null))));
     }
 
     public Object invoke(Container container) throws Exception {
