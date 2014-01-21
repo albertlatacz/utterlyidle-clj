@@ -1,18 +1,8 @@
-(ns
-  ^{:author "Albert Latacz",
-    :doc "Core binding functions for UtterlyIdle"}
+(ns ^{:author "Albert Latacz",
+      :doc    "Core binding functions for UtterlyIdle"}
   utterlyidle.core
-
-  (:use clojure.tools.namespace
-        [clojure.java.io :only [file]])
-
-  (:import [utterlyidle InvokeClojureResourceMethod]
-           [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration UriTemplate]
-           [com.googlecode.utterlyidle.httpserver RestServer]
-           [com.googlecode.utterlyidle.dsl DslBindings BindingBuilder]
-           [com.googlecode.utterlyidle.modules Modules Module]
-           [com.googlecode.totallylazy Pair])
-  )
+  (:require [clojure.tools.namespace :refer :all]
+            [clojure.java.io :refer [file]]))
 
 (defn- functions-in-namespace [ns]
   (let [resolve-func (fn [func] (ns-resolve ns func))
@@ -111,8 +101,8 @@
        ~(with-binding
           method
           path
-          (or consumes (consumes-for-method method))
-          (or produces (produces-for-method method))
+          consumes
+          produces
           (mapv name query-params)
           (mapv name form-params)
           (mapv name path-params)
