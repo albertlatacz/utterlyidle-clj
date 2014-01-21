@@ -14,10 +14,6 @@
            [com.googlecode.totallylazy Pair])
   )
 
-(defn- require-all [& namespaces]
-  (doseq [ns (mapcat identity namespaces)]
-    (require ns)))
-
 (defn- functions-in-namespace [ns]
   (let [resolve-func (fn [func] (ns-resolve ns func))
         funcs (keys (ns-publics ns))]
@@ -79,13 +75,13 @@
 (defn with-resources-in-ns
   "Returns all binded resources in given namespace."
   [ns]
+  (require ns)
   (filter #(:utterlyidle (meta %)) (functions-in-namespace ns)))
 
 (defn with-resources-in-dir
   "Returns all binded resources in given directory."
   [dir]
   (let [namespaces (find-namespaces-in-dir (file dir))]
-    (require-all namespaces)
     (mapcat with-resources-in-ns namespaces)))
 
 (defmacro with-resource
