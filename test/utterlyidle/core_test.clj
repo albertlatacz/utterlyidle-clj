@@ -1,9 +1,8 @@
 (ns utterlyidle.core_test
-  (:use clojure.test
-        utterlyidle.core
-        utterlyidle.testdata.bindings
-        utterlyidle.testdata.subns.bindings_in_subns
-        ))
+  (:require [clojure.test :refer :all]
+            [utterlyidle.core :refer :all]
+            [utterlyidle.testdata.bindings :refer :all]
+            [utterlyidle.testdata.subns.bindings_in_subns :refer :all]))
 
 (deftest finds-binded-functions-in-directory
   (is (= [#'utterlyidle.testdata.bindings/test-binding #'utterlyidle.testdata.subns.bindings_in_subns/test-binding-in-sub-ns]

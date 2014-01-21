@@ -1,6 +1,4 @@
-(ns ^{:author "Albert Latacz",
-      :doc    "Core binding functions for UtterlyIdle"}
-  utterlyidle.core
+(ns utterlyidle.core
   (:require [clojure.tools.namespace :refer :all]
             [clojure.java.io :refer [file]]))
 
@@ -58,9 +56,7 @@
                     :path-params path-params
                     :header-params header-params
                     :cookie-params cookie-params
-                    :request-params request-params
-                    }
-      )))
+                    :request-params request-params})))
 
 (defn with-resources-in-ns
   "Returns all binded resources in given namespace."

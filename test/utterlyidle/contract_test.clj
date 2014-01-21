@@ -1,9 +1,8 @@
 (ns utterlyidle.contract_test
-  (:use clojure.test
-        utterlyidle.core
-        [utterlyidle.server :as server]
-        [utterlyidle.client :as client]
-        )
+  (:require [clojure.test :refer :all]
+            [utterlyidle.core :refer :all]
+            [utterlyidle.server :as server]
+            [utterlyidle.client :as client])
   (:refer-clojure :exclude (get)))
 
 (defn test-server [f]

@@ -1,9 +1,5 @@
 (ns utterlyidle.example.resources
-  (:use clojure.tools.namespace
-        [clojure.java.io :only [file]]
-        utterlyidle.server
-        utterlyidle.core
-        ))
+  (:require [utterlyidle.core :refer :all]))
 
 (defresource test-binding [:get "/test-binding"] {}
   "GET SIMPLE")

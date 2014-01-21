@@ -1,13 +1,12 @@
 (ns utterlyidle.server
-  (:use utterlyidle.core
-        clojure.tools.namespace
-        [clojure.java.io :only [file]])
+  (:require [utterlyidle.core :refer :all]
+            [clojure.tools.namespace :refer :all]
+            [clojure.java.io :refer [file]])
 
   (:import [utterlyidle InvokeClojureResourceMethod]
-           [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration UriTemplate]
+           [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration]
            [com.googlecode.utterlyidle.httpserver RestServer]
-           [com.googlecode.utterlyidle.dsl DslBindings BindingBuilder]
-           [com.googlecode.utterlyidle.modules Modules Module]
+           [com.googlecode.utterlyidle.modules Modules]
            [com.googlecode.totallylazy Pair]))
 
 (defn- params-from-binding [binding]

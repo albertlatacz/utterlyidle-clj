@@ -1,16 +1,7 @@
 (ns utterlyidle.client
-  (:use clojure.tools.namespace
-        [clojure.java.io :only [file]])
-
-  (:import [utterlyidle InvokeClojureResourceMethod]
-           [com.googlecode.utterlyidle RequestBuilder Binding BasePath RestApplication ServerConfiguration UriTemplate]
-           [com.googlecode.utterlyidle.httpserver RestServer]
-           [com.googlecode.utterlyidle.dsl DslBindings BindingBuilder]
-           [com.googlecode.utterlyidle.modules Modules Module]
-           [com.googlecode.utterlyidle.handlers ClientHttpHandler]
-           [com.googlecode.totallylazy Pair])
-  (:refer-clojure :exclude (get))
-  )
+  (:import [com.googlecode.utterlyidle RequestBuilder]
+           [com.googlecode.utterlyidle.handlers ClientHttpHandler])
+  (:refer-clojure :exclude (get)))
 
 
 (defn- to-response-map [response]
