@@ -9,8 +9,10 @@ printf "[default]
      access_key = ${AWS_KEY}
      secret_key = ${AWS_SECRET}" > ${S3_CONFIG}
 
+
 lein2 test
 lein2 uberjar
+lein2 jar
 lein2 pom
 mv pom.xml target/pom.xml
 
@@ -31,6 +33,7 @@ function s3-deploy-maven {
 }
 
 s3-deploy-maven ${ARTEFACT}.jar
+s3-deploy-maven ${ARTEFACT}-standalone.jar
 s3-deploy-maven pom.xml
 
 rm ${S3_CONFIG}
