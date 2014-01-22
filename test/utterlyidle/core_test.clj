@@ -13,8 +13,9 @@
         (with-resources-in-ns 'utterlyidle.testdata.bindings))))
 
 (deftest binds-fn-correctly
-  (is (= (do (meta (with-resource :get "/test" ["consumes"] ["produces"]
-                     {:query-params [query-param] :form-params [form-param] :path-params [path-param] :cookie-params [cookie-param]
+  (is (= (do (meta (with-resource :get "/test"
+                     {:consumes ["consumes"] :produces ["produces"] :query-params [query-param]
+                      :form-params [form-param] :path-params [path-param] :cookie-params [cookie-param]
                       :header-params [header-param] :as [request]} (fn [request name] name))))
         {:utterlyidle {:arguments [["request" "name"]]
                        :method :get
@@ -29,8 +30,23 @@
                        :produces ["produces"]
                        }})))
 
+(deftest use-default-media-types-for-produces-and-consumes
+  (is (= (do (meta (with-resource :get "/test" {} (fn [] "test"))))
+         {:utterlyidle {:arguments [[]]
+                        :method :get
+                        :path "/test"
+                        :query-params []
+                        :form-params []
+                        :path-params []
+                        :cookie-params []
+                        :header-params []
+                        :request-params []
+                        :consumes ["*/*"]
+                        :produces ["*/*"]}})))
+
+
 (defn test-resource [name] name)
 (deftest binds-var-correctly
-  (is (= (:arguments (:utterlyidle (do (meta (with-resource :get "/test" ["consumes"] ["produces"] {:query-params [name]} test-resource)))))
+  (is (= (:arguments (:utterlyidle (do (meta (with-resource :get "/test" {:query-params [name]} test-resource)))))
         [["name"]])))
 

@@ -17,15 +17,10 @@
     (mapv #(mapv name %) (:arglists (meta (resolve form))))
     (mapv #(mapv name %) (fn->args form))))
 
-(defn- consumes-for-method [method]
-  (cond
-    (= method :get ) ["*/*"]
-    (= method :post ) ["application/x-www-form-urlencoded" "application/xml"]))
-
-(defn- produces-for-method [method]
-  (cond
-    (= method :get ) ["text/html"]
-    (= method :post ) ["text/html"]))
+(defn- resolve-media-types [types]
+  (if-not (empty? types)
+    types
+    ["*/*"]))
 
 (defn- parse-args [args]
   (let [method (nth (nth args 1) 0)]
@@ -38,8 +33,8 @@
      :header-params (:header-params (nth args 2))
      :cookie-params (:cookie-params (nth args 2))
      :request-params (vec (:as (nth args 2)))
-     :consumes (or (:consumes (nth args 2)) (consumes-for-method method))
-     :produces (or (:produces (nth args 2)) (produces-for-method method))
+     :consumes (:consumes (nth args 2))
+     :produces (:produces (nth args 2))
      :body (drop 3 args)
      }))
 
@@ -49,8 +44,8 @@
       :utterlyidle {:arguments args
                     :method method
                     :path path
-                    :consumes consumes
-                    :produces produces
+                    :consumes (resolve-media-types consumes)
+                    :produces (resolve-media-types produces)
                     :query-params query-params
                     :form-params form-params
                     :path-params path-params
@@ -72,8 +67,8 @@
 
 (defmacro with-resource
   "Binds function or symbol as a resource. Since named parameters are required only defn and fn forms are supported."
-  [method path consumes produces params function]
-  (let [{:keys [query-params form-params path-params header-params cookie-params as]} params]
+  [method path params function]
+  (let [{:keys [query-params form-params path-params header-params cookie-params consumes produces as]} params]
     `(with-binding
        ~method
        ~path
