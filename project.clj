@@ -9,8 +9,6 @@
   :java-source-paths ["src/java"]
   :repositories {"Dan Bodart" "http://repo.bodar.com.s3.amazonaws.com/"}
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/tools.namespace "0.1.0"]
+                 [org.clojure/tools.namespace "0.2.4"]
                  [com.googlecode.utterlyidle/utterlyidle "733"]]
-  :main utterlyidle.example.server
-  :aot [utterlyidle.example.server]
-  )
+  :main utterlyidle.example.server)
