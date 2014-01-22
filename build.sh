@@ -11,27 +11,27 @@ printf "[default]
 
 
 lein2 test
-lein2 uberjar
+lein2 jar
 lein2 pom
 mv pom.xml target/pom.xml
 
 function s3-deploy-maven {
     s3cmd -c ${S3_CONFIG} put \
         target/${1} \
-        s3://albertlatacz.published/repo/${PROJECT_NAME}/${PROJECT_NAME}/${PROJECT_VERSION}/${2}
+        s3://albertlatacz.published/repo/${PROJECT_NAME}/${PROJECT_NAME}/${PROJECT_VERSION}/${1}
 
     md5sum target/${1} | cut -d" " -f1,2 > target/${1}.md5
     s3cmd -c ${S3_CONFIG} put \
         target/${1}.md5 \
-        s3://albertlatacz.published/repo/${PROJECT_NAME}/${PROJECT_NAME}/${PROJECT_VERSION}/${2}.md5
+        s3://albertlatacz.published/repo/${PROJECT_NAME}/${PROJECT_NAME}/${PROJECT_VERSION}/${1}.md5
 
     sha1sum target/${1} | cut -d" " -f1,2 > target/${1}.sha1
     s3cmd -c ${S3_CONFIG} put \
         target/${1}.sha1 \
-        s3://albertlatacz.published/repo/${PROJECT_NAME}/${PROJECT_NAME}/${PROJECT_VERSION}/${2}.sha1
+        s3://albertlatacz.published/repo/${PROJECT_NAME}/${PROJECT_NAME}/${PROJECT_VERSION}/${1}.sha1
 }
 
-s3-deploy-maven ${ARTEFACT}-standalone.jar ${ARTEFACT}.jar
-s3-deploy-maven pom.xml pom.xml
+s3-deploy-maven ${ARTEFACT}.jar
+s3-deploy-maven pom.xml
 
 rm ${S3_CONFIG}
