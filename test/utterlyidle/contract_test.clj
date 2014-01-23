@@ -7,7 +7,7 @@
 
 (defn test-server [f]
   (def testServer
-    (server/start 9000 "/test-server"
+    (server/start {:port 9000 :base-path "/test-server"}
       (with-resources-in-ns 'utterlyidle.contract_test)))
   (f)
   (.close testServer))
@@ -16,8 +16,6 @@
 
 (defn test-url [path]
   (str "http://localhost:9000/test-server" path))
-
-
 
 
 (defresource get-binding-with-parameter [:get "/get-with-query-param"] {:query-params [param]}

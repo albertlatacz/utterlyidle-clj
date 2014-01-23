@@ -25,7 +25,7 @@
 (defn- fn->binding [binding]
   (let [binding-meta (:utterlyidle (meta binding))]
     (InvokeClojureResourceMethod/binding
-      (:path binding-meta)
+        (:path binding-meta)
       (. (name (:method binding-meta)) toUpperCase)
       (into-array String (:consumes binding-meta))
       (into-array String (:produces binding-meta))
@@ -37,10 +37,10 @@
   e.g
     (server/start 8080
       (with-resources-in-dir \"src/clojure/utterlyidle/example\"))"
-  [port base-path & bindings]
-  (let [conf (. (ServerConfiguration/defaultConfiguration) port port)
-        app (proxy [RestApplication] [(BasePath/basePath base-path)])]
+  [{:keys [port base-path]} & bindings]
+  (let [conf (.. (ServerConfiguration/defaultConfiguration) (port (or port 0)))
+        app (proxy [RestApplication] [(BasePath/basePath (or base-path "/"))])]
     (.add app
-      (Modules/bindingsModule
-        (into-array ^Binding (map fn->binding (flatten bindings)))))
+          (Modules/bindingsModule
+            (into-array ^Binding (map fn->binding (flatten bindings)))))
     (RestServer. app conf)))
