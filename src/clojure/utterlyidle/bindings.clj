@@ -35,8 +35,7 @@
      :request-params (vec (:as (nth args 2)))
      :consumes (:consumes (nth args 2))
      :produces (:produces (nth args 2))
-     :body (drop 3 args)
-     }))
+     :body (drop 3 args)}))
 
 (defn bind-function [method path consumes produces query-params form-params path-params header-params cookie-params request-params func args]
   (with-meta func
