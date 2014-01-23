@@ -23,14 +23,16 @@
       (first (:arguments binding)))))
 
 (defn- fn->binding [binding]
-  (let [binding-meta (:utterlyidle (meta binding))]
-    (InvokeClojureResourceMethod/binding
-      (:path binding-meta)
-      (.. (name (:method binding-meta)) (toUpperCase))
-      (into-array String (:consumes binding-meta))
-      (into-array String (:produces binding-meta))
-      binding
-      (into-array Pair (binding->params binding-meta)))))
+  (if (instance? Binding binding)
+    binding
+    (let [binding-meta (:binding (meta binding))]
+      (InvokeClojureResourceMethod/binding
+          (:path binding-meta)
+        (.. (name (:method binding-meta)) (toUpperCase))
+        (into-array String (:consumes binding-meta))
+        (into-array String (:produces binding-meta))
+        binding
+        (into-array Pair (binding->params binding-meta))))))
 
 (defn- bindings->array [bindings]
   (into-array ^Binding (map fn->binding (flatten bindings))))

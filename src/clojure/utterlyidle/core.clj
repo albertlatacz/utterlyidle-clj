@@ -38,26 +38,26 @@
      :body (drop 3 args)
      }))
 
-(defn with-binding [method path consumes produces query-params form-params path-params header-params cookie-params request-params func args]
+(defn bind-function [method path consumes produces query-params form-params path-params header-params cookie-params request-params func args]
   (with-meta func
     (assoc (meta func)
-      :utterlyidle {:arguments args
-                    :method method
-                    :path path
-                    :consumes (resolve-media-types consumes)
-                    :produces (resolve-media-types produces)
-                    :query-params query-params
-                    :form-params form-params
-                    :path-params path-params
-                    :header-params header-params
-                    :cookie-params cookie-params
-                    :request-params request-params})))
+      :binding {:arguments args
+                :method method
+                :path path
+                :consumes (resolve-media-types consumes)
+                :produces (resolve-media-types produces)
+                :query-params query-params
+                :form-params form-params
+                :path-params path-params
+                :header-params header-params
+                :cookie-params cookie-params
+                :request-params request-params})))
 
 (defn with-resources-in-ns
   "Returns all binded resources in given namespace."
   [ns]
   (require ns)
-  (filter #(:utterlyidle (meta %)) (functions-in-namespace ns)))
+  (filter #(:binding (meta %)) (functions-in-namespace ns)))
 
 (defn with-resources-in-dir
   "Returns all binded resources in given directory."
@@ -69,7 +69,7 @@
   "Binds function or symbol as a resource. Since named parameters are required only defn and fn forms are supported."
   [method path params function]
   (let [{:keys [query-params form-params path-params header-params cookie-params consumes produces as]} params]
-    `(with-binding
+    `(bind-function
        ~method
        ~path
        ~consumes
@@ -89,7 +89,7 @@
   (let [{:keys [fn-name method path consumes produces query-params form-params path-params header-params cookie-params request-params body]} (parse-args args)
         fn-params (concat request-params query-params form-params path-params header-params cookie-params)]
     `(defn
-       ~(with-binding
+       ~(bind-function
           method
           path
           consumes
