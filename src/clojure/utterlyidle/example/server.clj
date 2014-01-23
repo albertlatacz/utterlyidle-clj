@@ -1,6 +1,6 @@
 (ns utterlyidle.example.server
   (:gen-class)
-  (:require [utterlyidle.core2 :refer :all]))
+  (:require [utterlyidle.core :refer :all]))
 
 (defn var-binding-example [req name]
   (str "Hello from var! name=" name))

@@ -1,4 +1,4 @@
-(ns utterlyidle.core2)
+(ns utterlyidle.core)
 
 (defn- move-var [var sym]
   (let [sym (with-meta sym (assoc (meta var) :ns *ns*))]
