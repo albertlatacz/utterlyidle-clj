@@ -5,7 +5,7 @@
            [com.googlecode.utterlyidle.modules Modules]
            [com.googlecode.totallylazy Pair])
 
-  (:require [utterlyidle.core :refer :all]
+  (:require [utterlyidle.bindings :refer :all]
             [clojure.tools.namespace :refer :all]
             [clojure.java.io :refer [file]]))
 
@@ -37,9 +37,9 @@
 (defn- bindings->array [bindings]
   (into-array ^Binding (map fn->binding (flatten bindings))))
 
-(defn start
+(defn start-server
   "Starts server with specified resource bindings.
-  e.g (server/start {:port 8080 :base-path \"/\"
+  e.g (start-server {:port 8080 :base-path \"/\"
       (with-resources-in-dir \"src/clojure/utterlyidle/example\"))"
   [{:keys [port base-path]} & bindings]
   (let [config (.. (ServerConfiguration.) (port (or port 0)))
@@ -47,5 +47,5 @@
     (.. application (add (Modules/bindingsModule (bindings->array bindings))))
     (RestServer. application config)))
 
-(defn stop [server]
+(defn stop-server [server]
   (.close server))

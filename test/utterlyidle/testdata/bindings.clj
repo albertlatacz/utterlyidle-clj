@@ -1,5 +1,5 @@
 (ns utterlyidle.testdata.bindings
-  (:require [utterlyidle.core :refer :all]))
+  (:require [utterlyidle.bindings :refer :all]))
 
 (defn test-function []
   "Test function")

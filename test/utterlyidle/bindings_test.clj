@@ -1,6 +1,6 @@
-(ns utterlyidle.core_test
+(ns utterlyidle.bindings_test
   (:require [clojure.test :refer :all]
-            [utterlyidle.core :refer :all]
+            [utterlyidle.bindings :refer :all]
             [utterlyidle.testdata.bindings :refer :all]
             [utterlyidle.testdata.subns.bindings_in_subns :refer :all]))
 

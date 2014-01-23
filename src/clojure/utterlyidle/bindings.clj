@@ -1,4 +1,4 @@
-(ns utterlyidle.core
+(ns utterlyidle.bindings
   (:require [clojure.tools.namespace :refer :all]
             [clojure.java.io :refer [file]]))
 

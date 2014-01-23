@@ -1,16 +1,15 @@
 (ns utterlyidle.contract_test
   (:require [clojure.test :refer :all]
-            [utterlyidle.core :refer :all]
-            [utterlyidle.server :as server]
+            [utterlyidle.core2 :refer :all]
             [utterlyidle.client :as client])
   (:refer-clojure :exclude (get)))
 
 (defn test-server [f]
   (def testServer
-    (server/start {:port 9000 :base-path "/test-server"}
+    (start-server {:port 9000 :base-path "/test-server"}
       (with-resources-in-ns 'utterlyidle.contract_test)))
   (f)
-  (server/stop testServer))
+  (stop-server testServer))
 
 (use-fixtures :once test-server)
 
