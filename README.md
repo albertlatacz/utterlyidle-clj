@@ -9,6 +9,6 @@ utterlyidle-clj is a library of Clojure bindings for utterlyidle REST framework.
 License
 =======
 
-Copyright (C) 2012 Albert Latacz
+Copyright (C) Albert Latacz
 
 Distributed under the Eclipse Public License, the same as Clojure.

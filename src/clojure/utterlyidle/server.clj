@@ -35,7 +35,7 @@
 (defn start
   "Starts server with specified resource bindings.
   e.g
-    (server/start 8080
+    (server/start {:port 8080 :base-path \"/\"
       (with-resources-in-dir \"src/clojure/utterlyidle/example\"))"
   [{:keys [port base-path]} & bindings]
   (let [conf (.. (ServerConfiguration/defaultConfiguration) (port (or port 0)))
