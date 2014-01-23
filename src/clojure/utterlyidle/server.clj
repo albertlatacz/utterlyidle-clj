@@ -5,8 +5,7 @@
            [com.googlecode.utterlyidle.modules Modules]
            [com.googlecode.totallylazy Pair])
 
-  (:require [utterlyidle.bindings :refer :all]
-            [clojure.tools.namespace :refer :all]
+  (:require [clojure.tools.namespace :refer :all]
             [clojure.java.io :refer [file]]))
 
 (defn- binding->params [binding]

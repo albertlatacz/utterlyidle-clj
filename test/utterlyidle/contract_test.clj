@@ -1,6 +1,7 @@
 (ns utterlyidle.contract_test
   (:require [clojure.test :refer :all]
-            [utterlyidle.core :refer :all]
+            [utterlyidle.bindings :refer :all]
+            [utterlyidle.server :refer :all]
             [utterlyidle.client :as client])
   (:refer-clojure :exclude (get)))
 
