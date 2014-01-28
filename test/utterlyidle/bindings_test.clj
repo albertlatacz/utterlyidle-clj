@@ -17,7 +17,8 @@
                                   {:consumes ["consumes"] :produces ["produces"] :query-params [query-param]
                                    :form-params [form-param] :path-params [path-param] :cookie-params [cookie-param]
                                    :header-params [header-param] :as [request]} (fn [request name] name))))
-         {:binding {:arguments [["request" "name"]]
+         {:binding {:type :function
+                    :arguments [["request" "name"]]
                     :method :get
                     :path "/test"
                     :query-params ["query-param"]
@@ -32,7 +33,8 @@
 
 (deftest use-default-media-types-for-produces-and-consumes
   (is (= (do (meta (with-resource :get "/test" {} (fn [] "test"))))
-         {:binding {:arguments [[]]
+         {:binding {:type :function
+                    :arguments [[]]
                     :method :get
                     :path "/test"
                     :query-params []
@@ -49,4 +51,8 @@
 (deftest binds-var-correctly
   (is (= (:arguments (:binding (do (meta (with-resource :get "/test" {:query-params [name]} test-resource)))))
          [["name"]])))
+
+(deftest finds-correct-root
+  (is (.endsWith (str (package-root 'utterlyidle.testdata.subns.bindings_in_subns)) "test")))
+
 

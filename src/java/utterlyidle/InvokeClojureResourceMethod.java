@@ -1,10 +1,7 @@
 package utterlyidle;
 
 import clojure.lang.IFn;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.bindings.MatchedBinding;
 import com.googlecode.utterlyidle.bindings.actions.Action;

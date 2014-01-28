@@ -8,7 +8,8 @@
 (defn test-server [f]
   (def testServer
     (start-server {:port 9000 :base-path "/test-server"}
-      (with-resources-in-ns 'utterlyidle.contract_test)))
+      (with-resources-in-ns 'utterlyidle.contract_test)
+      (with-static-resources-in-ns 'utterlyidle.testdata.bindings "static")))
   (f)
   (stop-server testServer))
 
@@ -53,7 +54,6 @@
     (is (= (:body (client/post  (test-url path) "application/xml" "<helloThere/>")) "POST <helloThere/>"))))
 
 
-
 (defresource binding-with-different-parameters [:get "/binding-with-different-parameters/{path-param}"]
   {:query-params [query-param]
    :path-params [path-param]}
@@ -62,3 +62,8 @@
 (deftest supports-different-parameters
   (let [path "/binding-with-different-parameters/there"]
     (is (= (:body (client/get (test-url path) {:query-param "Hello"})) "GET Hello there"))))
+
+
+(deftest supports-static-resources
+  (let [path "/static/test.png"]
+    (is (= (-> (client/get (test-url path)) :status :code) 200))))

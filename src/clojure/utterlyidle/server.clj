@@ -3,7 +3,8 @@
            [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration]
            [com.googlecode.utterlyidle.httpserver RestServer]
            [com.googlecode.utterlyidle.modules Modules]
-           [com.googlecode.totallylazy Pair])
+           [com.googlecode.totallylazy Pair]
+           (com.googlecode.utterlyidle.dsl StaticBindingBuilder))
 
   (:require [clojure.tools.namespace :refer :all]
             [clojure.java.io :refer [file]]))
@@ -21,20 +22,29 @@
           (some #{arg} path-params) (InvokeClojureResourceMethod/pathParam arg)))
       (first (:arguments binding)))))
 
-(defn- fn->binding [binding]
-  (if (instance? Binding binding)
-    binding
-    (let [binding-meta (:binding (meta binding))]
-      (InvokeClojureResourceMethod/binding
-          (:path binding-meta)
-        (.. (name (:method binding-meta)) (toUpperCase))
-        (into-array String (:consumes binding-meta))
-        (into-array String (:produces binding-meta))
-        binding
-        (into-array Pair (binding->params binding-meta))))))
+(defn- fn->binding [obj]
+  (let [metadata (:binding (meta obj))]
+    (InvokeClojureResourceMethod/binding
+        (:path metadata)
+      (.. (name (:method metadata)) (toUpperCase))
+      (into-array String (:consumes metadata))
+      (into-array String (:produces metadata))
+      obj
+      (into-array Pair (binding->params metadata)))))
+
+
+(defn resources->binding [obj]
+  (let [binding-meta (:binding (meta obj))]
+    (seq (.. (StaticBindingBuilder/in (:url binding-meta)) (path (:path binding-meta)) (call)))))
+
+(defn- as-binding [obj]
+  (cond
+    (instance? Binding obj) [obj]
+    (= :function (get-in (meta obj) [:binding :type])) [(fn->binding obj)]
+    (= :static-resources (get-in (meta obj) [:binding :type])) (resources->binding obj)))
 
 (defn- bindings->array [bindings]
-  (into-array ^Binding (map fn->binding (flatten bindings))))
+  (into-array ^Binding (mapcat as-binding (flatten bindings))))
 
 (defn start-server
   "Starts server with specified resource bindings.
