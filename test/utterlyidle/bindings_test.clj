@@ -1,4 +1,5 @@
 (ns utterlyidle.bindings_test
+  (:import (java.net URL))
   (:require [clojure.test :refer :all]
             [utterlyidle.bindings :refer :all]
             [utterlyidle.testdata.bindings :refer :all]
@@ -52,7 +53,17 @@
   (is (= (:arguments (:binding (do (meta (with-resource :get "/test" {:query-params [name]} test-resource)))))
          [["name"]])))
 
-(deftest finds-correct-root
-  (is (.endsWith (str (package-root 'utterlyidle.testdata.subns.bindings_in_subns)) "test")))
+(deftest produces-static-resource-binding
+  (let [url (URL. "file:/some/url")
+        path "/static"]
+    (is (= (meta (with-static-resources-in url path))
+           {:binding {:type :static-resources
+                      :url  url
+                      :path path}}))))
+
+
+(deftest produces-static-resource-binding
+  (is (.endsWith (str (package-url 'utterlyidle.testdata.subns.bindings_in_subns))
+                 "test/utterlyidle/testdata/subns/")))
 
 

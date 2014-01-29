@@ -40,13 +40,22 @@
      :produces (:produces (nth args 2))
      :body (drop 3 args)}))
 
+(defn- package-root [ns]
+  (let [metadata (meta (first (functions-in-namespace ns)))]
+    (as-> (str (resource (:file metadata))) path
+          (split path #"/")
+          (drop-last (inc (count (filter #{\.} (str (:ns metadata))))) path)
+          (join "/" path)
+          (str path "/"))))
 
-(defn bind-static-resources [url path]
-  (with-meta
-    {}
-    {:binding {:type :static-resources
-               :url url
-               :path path}}))
+
+(defn- ns->dir [ns]
+  (as-> (str ns) path
+        (split path #"\.")
+        (drop-last path)
+        (join "/" path)
+        (str path "/")))
+
 
 (defn bind-function [method path consumes produces query-params form-params path-params header-params cookie-params request-params func args]
   (with-meta func
@@ -75,24 +84,24 @@
   (let [namespaces (find-namespaces-in-dir (file dir))]
     (mapcat with-resources-in-ns namespaces)))
 
-(defn package-root [ns]
-  (let [metadata (meta (first (functions-in-namespace ns)))]
-    (as-> (str (resource (:file metadata))) path
-          (split path #"/")
-          (drop-last (inc (count (filter #{\.} (str (:ns metadata))))) path)
-          (join "/" path))))
+(defn package-url
+  "Resolves package url (java.net.URL) of given namespace.
+  e.g. Given a 'aaa/bbb.clj' namespace, calling (package-url 'aaa.bbb)
+  resolves to file:/path/to/sources/aaa or jar:file:/path/to.jar!/aaa"
+  [ns]
+  (as-url (str (package-root ns) (ns->dir ns))))
 
 
-(defn ns->dir [ns]
-  (as-> (str ns) namespace
-        (split namespace #"\.")
-        (drop-last namespace)
-        (join "/" namespace)
-        (str namespace "/")))
+(defn with-static-resources-in
+  "Creates static resources binding for specified url (java.net.URL) and path.
+  e.g (with-static-resources-in (package-url 'aaa.bbb) \"/static\")"
+  [url path]
+  (with-meta
+    {}
+    {:binding {:type :static-resources
+               :url url
+               :path path}}))
 
-(defn with-static-resources-in-ns [ns path]
-  (let [ns-url (as-url (str (package-root ns) "/" (ns->dir ns)))]
-    (bind-static-resources ns-url path)))
 
 (defmacro with-resource
   "Binds function or symbol as a resource. Since named parameters are required only defn and fn forms are supported."

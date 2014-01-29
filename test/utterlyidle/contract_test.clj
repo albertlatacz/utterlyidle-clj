@@ -9,7 +9,7 @@
   (def testServer
     (start-server {:port 9000 :base-path "/test-server"}
       (with-resources-in-ns 'utterlyidle.contract_test)
-      (with-static-resources-in-ns 'utterlyidle.testdata.bindings "static")))
+      (with-static-resources-in (package-url 'utterlyidle.testdata.bindings) "static")))
   (f)
   (stop-server testServer))
 
