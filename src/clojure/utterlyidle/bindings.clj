@@ -48,14 +48,12 @@
           (join "/" path)
           (str path "/"))))
 
-
 (defn- ns->dir [ns]
   (as-> (str ns) path
         (split path #"\.")
         (drop-last path)
         (join "/" path)
         (str path "/")))
-
 
 (defn bind-function [method path consumes produces query-params form-params path-params header-params cookie-params request-params func args]
   (with-meta func
