@@ -5,6 +5,7 @@
             [clojure.string :refer [join split]]))
 
 (defn- functions-in-namespace [ns]
+  (require ns)
   (let [resolve-func (fn [func] (ns-resolve ns func))
         funcs (keys (ns-publics ns))]
     (map resolve-func funcs)))
@@ -66,7 +67,6 @@
 (defn with-resources-in-ns
   "Returns all binded resources in given namespace."
   [ns]
-  (require ns)
   (filter #(:binding (meta %)) (functions-in-namespace ns)))
 
 (defn with-resources-in-dir
