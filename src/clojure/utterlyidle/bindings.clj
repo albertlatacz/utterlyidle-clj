@@ -91,7 +91,6 @@
   [ns]
   (as-url (str (package-root ns) (ns->dir ns))))
 
-
 (defn with-static-resources-in
   "Creates static resources binding for specified url (java.net.URL) and path.
   e.g (with-static-resources-in (package-url 'aaa.bbb) \"/static\")"
@@ -101,7 +100,6 @@
     {:binding {:type :static-resources
                :url url
                :path path}}))
-
 
 (defmacro with-resource
   "Binds function or symbol as a resource. Since named parameters are required only defn and fn forms are supported."
