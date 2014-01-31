@@ -1,10 +1,12 @@
 (ns utterlyidle.server
   (:import [utterlyidle InvokeClojureResourceMethod]
+           [utterlyidle.bindings ResourceBinding StaticResourceBinding]
            [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration]
            [com.googlecode.utterlyidle.httpserver RestServer]
            [com.googlecode.utterlyidle.modules Modules]
            [com.googlecode.totallylazy Pair]
-           (com.googlecode.utterlyidle.dsl StaticBindingBuilder))
+           (com.googlecode.utterlyidle.dsl StaticBindingBuilder)
+           (sun.util ResourceBundleEnumeration))
 
   (:require [clojure.tools.namespace :refer :all]
             [clojure.java.io :refer [file]]))
@@ -22,26 +24,25 @@
           (some #{arg} path-params) (InvokeClojureResourceMethod/pathParam arg)))
       (first (:arguments binding)))))
 
-(defn- fn->binding [obj]
-  (let [metadata (:binding (meta obj))]
-    (InvokeClojureResourceMethod/binding
-        (:path metadata)
-      (.. (name (:method metadata)) (toUpperCase))
-      (into-array String (:consumes metadata))
-      (into-array String (:produces metadata))
-      obj
-      (into-array Pair (binding->params metadata)))))
+(defn- fn->binding [func]
+  (let [binding (:binding (meta func))]
+    (vector
+      (InvokeClojureResourceMethod/binding (:path binding)
+        (.. (name (:method binding)) (toUpperCase))
+        (into-array String (:consumes binding))
+        (into-array String (:produces binding))
+        func
+        (into-array Pair (binding->params binding))))))
 
 
-(defn resources->binding [obj]
-  (let [binding-meta (:binding (meta obj))]
-    (seq (.. (StaticBindingBuilder/in (:url binding-meta)) (path (:path binding-meta)) (call)))))
+(defn- resources->binding [binding]
+  (seq (.. (StaticBindingBuilder/in (:url binding)) (path (:path binding)) (call))))
 
 (defn- as-binding [obj]
-  (cond
-    (instance? Binding obj) [obj]
-    (= :function (get-in (meta obj) [:binding :type])) [(fn->binding obj)]
-    (= :static-resources (get-in (meta obj) [:binding :type])) (resources->binding obj)))
+  (let [binding (:binding (meta obj))]
+    (cond
+      (instance? ResourceBinding binding) (fn->binding obj)
+      (instance? StaticResourceBinding binding) (resources->binding binding))))
 
 (defn- bindings->array [bindings]
   (into-array ^Binding (mapcat as-binding (flatten bindings))))

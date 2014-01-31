@@ -55,21 +55,30 @@
         (join "/" path)
         (str path "/")))
 
+
+(defrecord ResourceBinding [method path consumes produces query-params form-params path-params header-params cookie-params request-params arguments])
+(defn resource-binding [method path consumes produces query-params form-params path-params header-params cookie-params request-params arguments]
+  (ResourceBinding. method path consumes produces query-params form-params path-params header-params cookie-params request-params arguments))
+
+(defrecord StaticResourceBinding [url path])
+(defn static-resource-binding [url path]
+  (StaticResourceBinding. url path))
+
 (defn bind-function [method path consumes produces query-params form-params path-params header-params cookie-params request-params func args]
   (with-meta func
     (assoc (meta func)
-      :binding {:type :function
-                :arguments args
-                :method method
-                :path path
-                :consumes (resolve-media-types consumes)
-                :produces (resolve-media-types produces)
-                :query-params query-params
-                :form-params form-params
-                :path-params path-params
-                :header-params header-params
-                :cookie-params cookie-params
-                :request-params request-params})))
+      :binding (ResourceBinding.
+                 method
+                 path
+                 (resolve-media-types consumes)
+                 (resolve-media-types produces)
+                 query-params
+                 form-params
+                 path-params
+                 header-params
+                 cookie-params
+                 request-params
+                 args))))
 
 (defn with-resources-in-ns
   "Returns all binded resources in given namespace."
@@ -95,9 +104,7 @@
   [url path]
   (with-meta
     {}
-    {:binding {:type :static-resources
-               :url url
-               :path path}}))
+    {:binding (StaticResourceBinding. url path)}))
 
 (defmacro with-resource
   "Binds function or symbol as a resource. Since named parameters are required only defn and fn forms are supported."

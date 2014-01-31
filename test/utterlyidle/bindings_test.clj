@@ -1,5 +1,5 @@
 (ns utterlyidle.bindings_test
-  (:import (java.net URL))
+  (:import [java.net URL])
   (:require [clojure.test :refer :all]
             [utterlyidle.bindings :refer :all]
             [utterlyidle.testdata.bindings :refer :all]
@@ -18,34 +18,34 @@
                                   {:consumes ["consumes"] :produces ["produces"] :query-params [query-param]
                                    :form-params [form-param] :path-params [path-param] :cookie-params [cookie-param]
                                    :header-params [header-param] :as [request]} (fn [request name] name))))
-         {:binding {:type :function
-                    :arguments [["request" "name"]]
-                    :method :get
-                    :path "/test"
-                    :query-params ["query-param"]
-                    :form-params ["form-param"]
-                    :path-params ["path-param"]
-                    :cookie-params ["cookie-param"]
-                    :header-params ["header-param"]
-                    :request-params ["request"]
-                    :consumes ["consumes"]
-                    :produces ["produces"]
-                    }})))
+         ;method path consumes produces query-params form-params path-params header-params cookie-params request-params arguments
+         {:binding (resource-binding
+                     :get
+                     "/test"
+                     ["consumes"]
+                     ["produces"]
+                     ["query-param"]
+                     ["form-param"]
+                     ["path-param"]
+                     ["header-param"]
+                     ["cookie-param"]
+                     ["request"]
+                     [["request" "name"]])})))
 
 (deftest use-default-media-types-for-produces-and-consumes
   (is (= (do (meta (with-resource :get "/test" {} (fn [] "test"))))
-         {:binding {:type :function
-                    :arguments [[]]
-                    :method :get
-                    :path "/test"
-                    :query-params []
-                    :form-params []
-                    :path-params []
-                    :cookie-params []
-                    :header-params []
-                    :request-params []
-                    :consumes ["*/*"]
-                    :produces ["*/*"]}})))
+         {:binding (resource-binding
+                     :get
+                     "/test"
+                     ["*/*"]
+                     ["*/*"]
+                     []
+                     []
+                     []
+                     []
+                     []
+                     []
+                     [[]])})))
 
 
 (defn test-resource [name] name)
@@ -58,7 +58,7 @@
         path "/static"]
     (is (= (meta (with-static-resources-in url path))
            {:binding {:type :static-resources
-                      :url  url
+                      :url url
                       :path path}}))))
 
 
