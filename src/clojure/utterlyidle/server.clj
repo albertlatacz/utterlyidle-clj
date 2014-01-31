@@ -10,6 +10,7 @@
            (com.googlecode.yadic Resolver))
 
   (:require [clojure.tools.namespace :refer :all]
+            [utterlyidle.bridge :refer :all]
             [utterlyidle.bindings :refer :all]
             [clojure.java.io :refer [file]]))
 
@@ -21,12 +22,12 @@
           (map
             (fn [arg]
               (cond
-                (some #{arg} request-params) (InvokeClojureResourceMethod/requestParam)
-                (some #{arg} query-params) (InvokeClojureResourceMethod/queryParam arg)
-                (some #{arg} form-params) (InvokeClojureResourceMethod/formParam arg)
-                (some #{arg} cookie-params) (InvokeClojureResourceMethod/cookieParam arg)
-                (some #{arg} header-params) (InvokeClojureResourceMethod/headerParam arg)
-                (some #{arg} path-params) (InvokeClojureResourceMethod/pathParam arg)))
+                (some #{arg} request-params) (request-param)
+                (some #{arg} query-params) (query-param arg)
+                (some #{arg} form-params) (form-param arg)
+                (some #{arg} cookie-params) (cookie-param arg)
+                (some #{arg} header-params) (header-param arg)
+                (some #{arg} path-params) (path-param arg)))
             (first (:arguments binding))))))
 
 (defn- fn->binding [func]

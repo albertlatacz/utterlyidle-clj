@@ -36,26 +36,6 @@ public class InvokeClojureResourceMethod implements Action {
                 .join(sequence(params));
     }
 
-    public static Pair<Type, Option<Parameter>> queryParam(String name) {
-        return namedParameter(QueryParameters.class, name);
-    }
-
-    public static Pair<Type, Option<Parameter>> formParam(String name) {
-        return namedParameter(FormParameters.class, name);
-    }
-
-    public static Pair<Type, Option<Parameter>> cookieParam(String name) {
-        return namedParameter(CookieParameters.class, name);
-    }
-
-    public static Pair<Type, Option<Parameter>> headerParam(String name) {
-        return namedParameter(HeaderParameters.class, name);
-    }
-
-    public static Pair<Type, Option<Parameter>> pathParam(String name) {
-        return namedParameter(PathParameters.class, name);
-    }
-
     public static Type customType(final String name) {
         return new ParameterizedType() {
             public int hashCode() {
@@ -88,16 +68,8 @@ public class InvokeClojureResourceMethod implements Action {
         return Pair.pair((Type) IFn.class, Option.<Parameter>some(new DefinedParameter<IFn>(IFn.class, value)));
     }
 
-    public static Pair<Type, Option<Parameter>> requestParam() {
-        return Pair.pair((Type) Request.class, Option.<Parameter>none());
-    }
-
     private static Action dispatchAction() {
         return new InvokeClojureResourceMethod();
-    }
-
-    private static Pair<Type, Option<Parameter>> namedParameter(Class<? extends Parameters<String, String, ?>> parametersClass, String name) {
-        return Pair.pair((Type) String.class, Option.<Parameter>some(new NamedParameter(name, parametersClass, option((String) null))));
     }
 
     public Object invoke(Container requestScope) throws Exception {
@@ -115,7 +87,6 @@ public class InvokeClojureResourceMethod implements Action {
 
         Sequence<Object> applicationScoped = sequence((Iterable<Iterable<Object>>) bindings.valAt(scopedParamKW))
                 .map(new Function1<Iterable<Object>, Object>() {
-                    @Override
                     public Object call(Iterable<Object> o) throws Exception {
                         return application.applicationScope().resolve(customType(sequence(o).first().toString()));
                     }
