@@ -11,4 +11,5 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/tools.namespace "0.2.4"]
                  [com.googlecode.utterlyidle/utterlyidle "733"]]
+  :aot [utterlyidle.bindings utterlyidle.server]
   :main utterlyidle.example.server)

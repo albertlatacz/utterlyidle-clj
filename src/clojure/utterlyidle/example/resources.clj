@@ -17,3 +17,6 @@
                                                      :form-params [other]}
   (str "POST " name " " other))
 
+(defresource test-binding [:get "/test-binding5"] {:query-params [name] :scoped-params {:foo foo}}
+  (str "GET WITH SCOPED " name " " foo))
+

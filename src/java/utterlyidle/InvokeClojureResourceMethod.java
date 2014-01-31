@@ -1,8 +1,9 @@
 package utterlyidle;
 
-import clojure.lang.IFn;
+import clojure.lang.*;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.*;
+import com.googlecode.utterlyidle.Binding;
 import com.googlecode.utterlyidle.bindings.MatchedBinding;
 import com.googlecode.utterlyidle.bindings.actions.Action;
 import com.googlecode.utterlyidle.bindings.actions.ActionMetaData;
@@ -10,6 +11,7 @@ import com.googlecode.utterlyidle.cookies.CookieParameters;
 import com.googlecode.utterlyidle.dsl.DefinedParameter;
 import com.googlecode.yadic.Container;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import static clojure.lang.Reflector.invokeInstanceMember;
@@ -54,6 +56,34 @@ public class InvokeClojureResourceMethod implements Action {
         return namedParameter(PathParameters.class, name);
     }
 
+    public static Type customType(final String name) {
+        return new ParameterizedType() {
+            public int hashCode() {
+                return name.hashCode();
+            }
+
+            public boolean equals(Object obj) {
+                return name.equals(obj);
+            }
+
+            public String toString() {
+                return "Custom Type [" + name + "]";
+            }
+
+            public Type[] getActualTypeArguments() {
+                return new Type[0];
+            }
+
+            public Type getRawType() {
+                return getClass();
+            }
+
+            public Type getOwnerType() {
+                return getClass();
+            }
+        };
+    }
+
     private static Pair<Type, Option<Parameter>> functionParam(IFn value) {
         return Pair.pair((Type) IFn.class, Option.<Parameter>some(new DefinedParameter<IFn>(IFn.class, value)));
     }
@@ -70,12 +100,34 @@ public class InvokeClojureResourceMethod implements Action {
         return Pair.pair((Type) String.class, Option.<Parameter>some(new NamedParameter(name, parametersClass, option((String) null))));
     }
 
-    public Object invoke(Container container) throws Exception {
-        Request request = container.get(Request.class);
-        Application application = container.get(Application.class);
-        Binding binding = container.get(MatchedBinding.class).value();
+    public Object invoke(Container requestScope) throws Exception {
+        Request request = requestScope.get(Request.class);
+        final Application application = requestScope.get(Application.class);
+        Binding binding = requestScope.get(MatchedBinding.class).value();
         Object[] params = new ParametersExtractor(binding.uriTemplate(), application, binding.parameters()).extract(request);
-        return invokeInstanceMember("invoke", params[0], sequence(params).tail().toArray(Object.class));
+
+
+        IPersistentMap param = ((IMeta) params[0]).meta();
+
+        Object bindingKW = Keyword.intern("binding");
+        IPersistentMap bindings = (IPersistentMap) param.valAt(bindingKW);
+        Object scopedParamKW = Keyword.intern("scoped-params");
+
+        Sequence<Object> applicationScoped = sequence((Iterable<Iterable<Object>>) bindings.valAt(scopedParamKW))
+                .map(new Function1<Iterable<Object>, Object>() {
+                    @Override
+                    public Object call(Iterable<Object> o) throws Exception {
+                        return application.applicationScope().resolve(customType(sequence(o).first().toString()));
+                    }
+                });
+
+        try {
+            return invokeInstanceMember("invoke", params[0], applicationScoped.join(sequence(params).tail()).toArray(Object.class));
+        } catch (Exception e) {
+            System.out.println("e = " + e);
+            return null;
+        }
+
     }
 
     public String description() {

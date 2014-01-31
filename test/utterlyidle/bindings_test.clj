@@ -1,5 +1,6 @@
 (ns utterlyidle.bindings_test
-  (:import [java.net URL])
+  (:import [java.net URL]
+           [utterlyidle.bindings ResourceBinding StaticResourceBinding])
   (:require [clojure.test :refer :all]
             [utterlyidle.bindings :refer :all]
             [utterlyidle.testdata.bindings :refer :all]
@@ -15,11 +16,10 @@
 
 (deftest binds-fn-correctly
   (is (= (do (meta (with-resource :get "/test"
-                                  {:consumes ["consumes"] :produces ["produces"] :query-params [query-param]
-                                   :form-params [form-param] :path-params [path-param] :cookie-params [cookie-param]
-                                   :header-params [header-param] :as [request]} (fn [request name] name))))
-         ;method path consumes produces query-params form-params path-params header-params cookie-params request-params arguments
-         {:binding (resource-binding
+                                  {:consumes      ["consumes"] :produces ["produces"] :query-params [query-param]
+                                   :form-params   [form-param] :path-params [path-param] :cookie-params [cookie-param]
+                                   :header-params [header-param] :scoped-params {:foo foo} :as [request]} (fn [request name] name))))
+         {:binding (ResourceBinding.
                      :get
                      "/test"
                      ["consumes"]
@@ -30,11 +30,12 @@
                      ["header-param"]
                      ["cookie-param"]
                      ["request"]
+                     {:foo "foo"}
                      [["request" "name"]])})))
 
 (deftest use-default-media-types-for-produces-and-consumes
   (is (= (do (meta (with-resource :get "/test" {} (fn [] "test"))))
-         {:binding (resource-binding
+         {:binding (ResourceBinding.
                      :get
                      "/test"
                      ["*/*"]
@@ -45,6 +46,7 @@
                      []
                      []
                      []
+                     {}
                      [[]])})))
 
 
@@ -58,7 +60,7 @@
         path "/static"]
     (is (= (meta (with-static-resources-in url path))
            {:binding {:type :static-resources
-                      :url url
+                      :url  url
                       :path path}}))))
 
 
