@@ -35,14 +35,15 @@
         (into-array Pair (binding->params binding))))))
 
 
-(defn- resources->binding [binding]
-  (seq (.. (StaticBindingBuilder/in (:url binding)) (path (:path binding)) (call))))
+(defn- resources->binding [obj]
+  (let [binding (:binding (meta obj))]
+    (seq (.. (StaticBindingBuilder/in (:url binding)) (path (:path binding)) (call)))))
 
 (defn- as-binding [obj]
   (let [binding (:binding (meta obj))]
     (cond
       (instance? ResourceBinding binding) (fn->binding obj)
-      (instance? StaticResourceBinding binding) (resources->binding binding))))
+      (instance? StaticResourceBinding binding) (resources->binding obj))))
 
 (defn- bindings->array [bindings]
   (into-array ^Binding (mapcat as-binding (flatten bindings))))
