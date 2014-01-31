@@ -1,12 +1,18 @@
 (ns utterlyidle.bridge
   (:import (com.googlecode.totallylazy Pair Option Sequences)
            (com.googlecode.utterlyidle NamedParameter QueryParameters FormParameters HeaderParameters PathParameters
-                                       Request Binding UriTemplate)
+                                       Request Binding UriTemplate Application ParametersExtractor)
            (com.googlecode.utterlyidle.cookies CookieParameters)
            (java.lang.reflect ParameterizedType Type)
            (com.googlecode.utterlyidle.bindings.actions Action)
            (clojure.lang IFn)
-           (com.googlecode.utterlyidle.dsl DefinedParameter)))
+           (com.googlecode.utterlyidle.dsl DefinedParameter)
+           (com.googlecode.utterlyidle.bindings MatchedBinding))
+  (:require [clojure.set :refer [map-invert]])
+  )
+
+(defn- as-sequence [coll]
+  (.. (Sequences/sequence) (join coll)))
 
 (defn- named-parameter [parameter-type name]
   (Pair/pair String (Option/some (NamedParameter. name parameter-type (Option/none)))))
@@ -39,51 +45,39 @@
     (getOwnerType [this] (class this))))
 
 
-(defn- invoke-clojure [container]
-  )
+
+(defn scoped-param-value [request-scope name]
+  (.resolve request-scope (custom-type (str name))))
+
+
+(defn- resolve-scoped-params [request-scope scoped-params]
+  (map #(scoped-param-value request-scope (first %))
+       scoped-params))
 
 (defn- create-action []
   (reify Action
     (description [this] "Clojure Binding")
-    (invoke [this container] (invoke-clojure container))
-    (metaData [this] [])))
+    (metaData [this] [])
+    (invoke [this request-scope]
+      (let [request (.get request-scope Request)
+            application (.get request-scope Application)
+            binding (.. request-scope (get MatchedBinding) (value))
+            [func & request-params] (seq (.. (ParametersExtractor. (.uriTemplate binding) application (.parameters binding)) (extract request)))
+            scoped-params (resolve-scoped-params request-scope (get-in (meta func) [:binding :scoped-params]))]
+        (apply func (concat scoped-params request-params))))))
 
 (defn- function-param [func]
-  (Pair/pair IFn (Option/some (DefinedParameter. IFn func ))))
+  (Pair/pair IFn (Option/some (DefinedParameter. IFn func))))
 
 (defn- dispatch-function-parameters [func params]
-  ;private static Sequence<Pair<Type, Option<Parameter>>> dispatchMethodParameters (IFn function, Pair<Type, Option<Parameter>> [] params)
-  ;{
-  ;  return sequence (functionParam (function))
-  ;         .join (sequence (params)) ;
-  ;         }
-  )
-
-
-
+  (cons (function-param func) params))
 
 (defn create-binding [path method consumes produces function params]
-  ;(Binding. (create-action)
-  ;          (UriTemplate/uriTemplate path)
-  ;          method
-  ;          (Sequences/sequence consumes)
-  ;          (Sequences/sequence produces)
-  ;          )
-
-
-
-
-  ;public static Binding binding(String path, String method, String[] consumes, String[] produces, IFn function, Pair<Type, Option<Parameter>>[] params) throws NoSuchMethodException {
-  ;return new Binding(
-  ;                    dispatchAction(),
-  ;                                  uriTemplate(path),
-  ;                                  method,
-  ;                                  sequence(consumes),
-  ;                                  sequence(produces),
-  ;                                  dispatchMethodParameters(function, params),
-  ;                                  1, false, null);
-  ;}
-  )
-
-
-
+  (Binding.
+    (create-action)
+    (UriTemplate/uriTemplate path)
+    method
+    (as-sequence consumes)
+    (as-sequence produces)
+    (as-sequence (dispatch-function-parameters function params))
+    1 false nil))

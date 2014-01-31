@@ -1,6 +1,5 @@
 (ns utterlyidle.server
-  (:import [utterlyidle InvokeClojureResourceMethod]
-           [utterlyidle.bindings ResourceBinding StaticResourceBinding ScopedParameterBinding]
+  (:import [utterlyidle.bindings ResourceBinding StaticResourceBinding ScopedParameterBinding]
            [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration]
            [com.googlecode.utterlyidle.httpserver RestServer]
            [com.googlecode.utterlyidle.modules Modules]
@@ -33,12 +32,13 @@
 (defn- fn->binding [func]
   (let [binding (:binding (meta func))]
     (vector
-      (InvokeClojureResourceMethod/binding (:path binding)
+      (create-binding
+        (:path binding)
         (.. (name (:method binding)) (toUpperCase))
-        (into-array String (:consumes binding))
-        (into-array String (:produces binding))
+        (:consumes binding)
+        (:produces binding)
         func
-        (into-array Pair (binding->params binding))))))
+        (binding->params binding)))))
 
 
 (defn- resources->binding [binding]

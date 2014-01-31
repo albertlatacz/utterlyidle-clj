@@ -12,4 +12,4 @@
                 (with-resource :get "/fn-binding" {:query-params [name] :as [req]} (fn [req name] (str "Hello from fn! name=" name)))
                 (with-resources-in-ns 'utterlyidle.example.resources)
                 (with-static-resources-in (package-url 'utterlyidle.example.resources) "static")
-                (with-application-scoped {:foo "Hello there"})))
+                (with-application-scoped {:foo "Hello there!"})))
