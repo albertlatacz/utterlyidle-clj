@@ -11,6 +11,8 @@
   (:require [clojure.tools.namespace :refer :all]
             [clojure.java.io :refer [file]]))
 
+
+
 (defn- binding->params [binding]
   (let [{:keys [query-params form-params cookie-params header-params path-params request-params]} binding]
     (mapv
@@ -46,15 +48,30 @@
 (defn- bindings->array [bindings]
   (into-array ^Binding (mapcat as-binding (flatten bindings))))
 
+
+(defprotocol Server
+  (start [this options bindings])
+  (stop [this]))
+
+(defrecord UtterlyIdleServer []
+  Server
+  (start [this options bindings]
+    (let [{:keys [port base-path]} options
+          config (.. (ServerConfiguration.) (port (or port 0)))
+          application (RestApplication. (BasePath/basePath (or base-path "/")))]
+      (.. application (add (Modules/bindingsModule (bindings->array bindings))))
+      (assoc this :server (RestServer. application config))))
+
+  (stop [this]
+    (.close (:server this))))
+
+
 (defn start-server
   "Starts server with specified resource bindings.
   e.g (start-server {:port 8080 :base-path \"/\"
       (with-resources-in-dir \"src/clojure/utterlyidle/example\"))"
-  [{:keys [port base-path]} & bindings]
-  (let [config (.. (ServerConfiguration.) (port (or port 0)))
-        application (RestApplication. (BasePath/basePath (or base-path "/")))]
-    (.. application (add (Modules/bindingsModule (bindings->array bindings))))
-    (RestServer. application config)))
+  [options & bindings]
+  (start (UtterlyIdleServer.) options bindings))
 
 (defn stop-server [server]
-  (.close server))
+  (stop server))
