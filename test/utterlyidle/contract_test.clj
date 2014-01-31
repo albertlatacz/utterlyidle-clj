@@ -9,7 +9,8 @@
   (def testServer
     (start-server {:port 9000 :base-path "/test-server"}
       (with-resources-in-ns 'utterlyidle.contract_test)
-      (with-static-resources-in (package-url 'utterlyidle.testdata.bindings) "static")))
+      (with-static-resources-in (package-url 'utterlyidle.testdata.bindings) "static")
+      (with-application-scoped {:application-scoped "app scoped"})))
   (f)
   (stop-server testServer))
 
@@ -63,6 +64,13 @@
   (let [path "/binding-with-different-parameters/there"]
     (is (= (:body (client/get (test-url path) {:query-param "Hello"})) "GET Hello there"))))
 
+(defresource binding-with-application-scoped [:get "/binding-with-application-scoped"]
+  {:scoped-params {:application-scoped app-scoped}}
+  (str "GET SCOPED " app-scoped))
+
+(deftest supports-application-scoping
+  (let [path "/binding-with-application-scoped"]
+    (is (= (:body (client/get (test-url path))) "GET SCOPED app scoped"))))
 
 (deftest supports-static-resources
   (let [path "/static/test.png"]
