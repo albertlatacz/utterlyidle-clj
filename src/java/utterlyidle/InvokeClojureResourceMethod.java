@@ -1,13 +1,14 @@
 package utterlyidle;
 
-import clojure.lang.*;
+import clojure.lang.IFn;
+import clojure.lang.IMeta;
+import clojure.lang.IPersistentMap;
+import clojure.lang.Keyword;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.*;
-import com.googlecode.utterlyidle.Binding;
 import com.googlecode.utterlyidle.bindings.MatchedBinding;
 import com.googlecode.utterlyidle.bindings.actions.Action;
 import com.googlecode.utterlyidle.bindings.actions.ActionMetaData;
-import com.googlecode.utterlyidle.cookies.CookieParameters;
 import com.googlecode.utterlyidle.dsl.DefinedParameter;
 import com.googlecode.yadic.Container;
 
@@ -15,7 +16,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import static clojure.lang.Reflector.invokeInstanceMember;
-import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.UriTemplate.uriTemplate;
 

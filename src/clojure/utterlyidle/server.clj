@@ -68,7 +68,7 @@
       (doseq [param x]
         (.. application
             (applicationScope)
-            (addType (InvokeClojureResourceMethod/customType (name (:name param)))
+            (addType (custom-type (name (:name param)))
                      (reify Resolver
                        (resolve [this type] (:value param)))))))
 
