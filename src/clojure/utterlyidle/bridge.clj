@@ -45,15 +45,6 @@
     (getOwnerType [this] (class this))))
 
 
-
-(defn scoped-param-value [request-scope name]
-  (.resolve request-scope (custom-type (str name))))
-
-
-(defn- resolve-scoped-params [request-scope scoped-params]
-  (map #(scoped-param-value request-scope (first %))
-       scoped-params))
-
 (defn- create-action []
   (reify Action
     (description [this] "Clojure Binding")
@@ -62,15 +53,15 @@
       (let [request (.get request-scope Request)
             application (.get request-scope Application)
             binding (.. request-scope (get MatchedBinding) (value))
-            [func & request-params] (seq (.. (ParametersExtractor. (.uriTemplate binding) application (.parameters binding)) (extract request)))
-            scoped-params (resolve-scoped-params request-scope (get-in (meta func) [:binding :scoped-params]))]
+            [func & request-params] (seq (.. (ParametersExtractor. (.uriTemplate binding) application (.parameters binding))
+                                             (extract request)))
+            scoped-params (map #(.resolve request-scope (custom-type (str (first %))))
+                               (get-in (meta func) [:binding :scoped-params]))]
         (apply func (concat scoped-params request-params))))))
 
-(defn- function-param [func]
-  (Pair/pair IFn (Option/some (DefinedParameter. IFn func))))
-
 (defn- dispatch-function-parameters [func params]
-  (cons (function-param func) params))
+  (cons (Pair/pair IFn (Option/some (DefinedParameter. IFn func)))
+        params))
 
 (defn create-binding [path method consumes produces function params]
   (Binding.

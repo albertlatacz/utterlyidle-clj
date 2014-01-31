@@ -106,7 +106,9 @@
   [url path]
   (StaticResourceBinding. url path))
 
-(defn with-application-scoped [params]
+(defn with-application-scoped
+  "Creates bindings in application scope."
+  [params]
   (map (fn [[k v]] (ScopedParameterBinding. k v)) params))
 
 (defmacro with-resource
