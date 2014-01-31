@@ -102,9 +102,7 @@
   "Creates static resources binding for specified url (java.net.URL) and path.
   e.g (with-static-resources-in (package-url 'aaa.bbb) \"/static\")"
   [url path]
-  (with-meta
-    {}
-    {:binding (StaticResourceBinding. url path)}))
+  (StaticResourceBinding. url path))
 
 (defmacro with-resource
   "Binds function or symbol as a resource. Since named parameters are required only defn and fn forms are supported."
