@@ -6,7 +6,8 @@
            [com.googlecode.totallylazy Pair]
            (com.googlecode.utterlyidle.dsl StaticBindingBuilder)
            (sun.util ResourceBundleEnumeration)
-           (com.googlecode.yadic Resolver))
+           (com.googlecode.yadic Resolver)
+           (java.net InetAddress))
 
   (:require [clojure.tools.namespace :refer :all]
             [utterlyidle.bridge :refer :all]
@@ -58,10 +59,13 @@
   "Starts server with specified resource bindings.
   e.g (start-server {:port 8080 :base-path \"/\"
       (with-resources-in-dir \"src/clojure/utterlyidle/example\"))"
-  [options & bindings]
-  (let [{:keys [port base-path]} options
-        config (.. (ServerConfiguration.) (port (or port 0)))
-        application (RestApplication. (BasePath/basePath (or base-path "/")))]
+  [{:keys [port base-path max-threads bind-address] :or {port 0, base-path "/", max-threads 50, bind-address "0.0.0.0"}} & bindings]
+  (let [config (.. (ServerConfiguration.)
+                   (port port)
+                   (maxThreadNumber max-threads)
+                   (bindAddress (InetAddress/getByName bind-address))
+                   (basePath (BasePath/basePath base-path)))
+        application (RestApplication. (BasePath/basePath base-path))]
     (.. application (add (Modules/bindingsModule (bindings->array bindings))))
 
     (let [x (filter #(instance? ScopedParameterBinding %) (flatten bindings))]
@@ -71,8 +75,6 @@
             (addType (custom-type (name (:name param)))
                      (reify Resolver
                        (resolve [this type] (:value param)))))))
-
-
     {:server (RestServer. application config)}))
 
 (defn stop-server [server]
