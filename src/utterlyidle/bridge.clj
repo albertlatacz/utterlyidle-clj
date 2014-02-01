@@ -6,8 +6,9 @@
            (java.lang.reflect ParameterizedType Type)
            (com.googlecode.utterlyidle.bindings.actions Action)
            (clojure.lang IFn)
-           (com.googlecode.utterlyidle.dsl DefinedParameter)
-           (com.googlecode.utterlyidle.bindings MatchedBinding))
+           (com.googlecode.utterlyidle.dsl DefinedParameter StaticBindingBuilder)
+           (com.googlecode.utterlyidle.bindings MatchedBinding)
+           (com.googlecode.yadic Resolver))
   (:require [clojure.set :refer [map-invert]])
   )
 
@@ -35,6 +36,15 @@
 (defn path-param [name]
   (named-parameter PathParameters name))
 
+(defn static-resources-binding [url path]
+  (seq (.. (StaticBindingBuilder/in url)
+           (path path)
+           (call))))
+
+(defn value-resolver [value]
+  (reify Resolver
+    (resolve [this type] value)))
+
 (defn custom-type [name]
   (reify ParameterizedType
     (hashCode [this] (.hashCode name))
@@ -43,7 +53,6 @@
     (getActualTypeArguments [this] (into-array Type []))
     (getRawType [this] (class this))
     (getOwnerType [this] (class this))))
-
 
 (defn- create-action []
   (reify Action

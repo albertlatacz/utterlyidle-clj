@@ -3,17 +3,12 @@
            [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration]
            [com.googlecode.utterlyidle.httpserver RestServer]
            [com.googlecode.utterlyidle.modules Modules]
-           [com.googlecode.totallylazy Pair]
-           (com.googlecode.utterlyidle.dsl StaticBindingBuilder)
-           (sun.util ResourceBundleEnumeration)
-           (com.googlecode.yadic Resolver)
            (java.net InetAddress))
 
   (:require [clojure.tools.namespace :refer :all]
             [utterlyidle.bridge :refer :all]
             [utterlyidle.bindings :refer :all]
             [clojure.java.io :refer [file]]))
-
 
 
 (defn- binding->params [binding]
@@ -41,14 +36,10 @@
         func
         (binding->params binding)))))
 
-
-(defn- resources->binding [binding]
-  (seq (.. (StaticBindingBuilder/in (:url binding)) (path (:path binding)) (call))))
-
 (defn- as-binding [obj]
   (cond
     (instance? ResourceBinding (:binding (meta obj))) (fn->binding obj)
-    (instance? StaticResourceBinding obj) (resources->binding obj)
+    (instance? StaticResourceBinding obj) (static-resources-binding (:url obj) (:path obj))
     :default []))
 
 (defn- bindings->array [bindings]
@@ -67,14 +58,11 @@
                    (basePath (BasePath/basePath base-path)))
         application (RestApplication. (BasePath/basePath base-path))]
     (.. application (add (Modules/bindingsModule (bindings->array bindings))))
-
     (let [x (filter #(instance? ScopedParameterBinding %) (flatten bindings))]
       (doseq [param x]
         (.. application
             (applicationScope)
-            (addType (custom-type (name (:name param)))
-                     (reify Resolver
-                       (resolve [this type] (:value param)))))))
+            (addType (custom-type (name (:name param))) (value-resolver (:value param))))))
     {:server (RestServer. application config)}))
 
 (defn stop-server [server]
