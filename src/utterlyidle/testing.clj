@@ -7,6 +7,6 @@
   Use 'client' binding to query the server."
   [bindings & body]
   `(let [server# (start-server {} ~bindings)
-         ~'client (.application server#)]
+         ~'client (.application (:server server#))]
      (try ~@body
           (finally (stop-server server#)))))
