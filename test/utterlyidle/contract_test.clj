@@ -1,4 +1,5 @@
 (ns utterlyidle.contract_test
+  (:import (com.googlecode.utterlyidle MediaType))
   (:require [clojure.test :refer :all]
             [utterlyidle.bindings :refer :all]
             [utterlyidle.server :refer :all]
@@ -9,7 +10,10 @@
   (def testServer
     (start-server {:port 9000 :base-path "/test-server"}
       (with-resources-in-ns 'utterlyidle.contract_test)
-      (with-static-resources-in (package-url 'utterlyidle.testdata.bindings) "static")
+      (with-static-resources-in
+        (package-url 'utterlyidle.testdata.bindings)
+        "static"
+        :extensions {"ping" MediaType/IMAGE_PNG})
       (with-application-scoped {:application-scoped "app scoped"})))
   (f)
   (stop-server testServer))
@@ -73,5 +77,5 @@
     (is (= (:body (client/get (test-url path))) "GET SCOPED app scoped"))))
 
 (deftest supports-static-resources
-  (let [path "/static/test.png"]
+  (let [path "/static/test.ping"]
     (is (= (-> (client/get (test-url path)) :status :code) 200))))
