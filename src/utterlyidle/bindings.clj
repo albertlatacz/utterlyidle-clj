@@ -62,7 +62,7 @@
 
 
 (defrecord ResourceBinding [method path consumes produces query-params form-params path-params header-params cookie-params request-params scoped-params arguments])
-(defrecord StaticResourceBinding [url path])
+(defrecord StaticResourceBinding [url path extensions])
 (defrecord ScopedParameterBinding [name value])
 
 (defn bind-function [func method path consumes produces query-params form-params path-params header-params cookie-params request-params scoped-params args]
@@ -103,8 +103,8 @@
 (defn with-static-resources-in
   "Creates static resources binding for specified url (java.net.URL) and path.
   e.g (with-static-resources-in (package-url 'aaa.bbb) \"/static\")"
-  [url path]
-  (StaticResourceBinding. url path))
+  [url path & {:keys [extensions]}]
+  (StaticResourceBinding. url path extensions))
 
 (defn with-application-scoped
   "Creates bindings in application scope."
@@ -152,3 +152,5 @@
           [(mapv name fn-params)])
        ~(vec fn-params)
        ~@body)))
+
+

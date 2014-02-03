@@ -39,7 +39,7 @@
 (defn- as-binding [obj]
   (cond
     (instance? ResourceBinding (:binding (meta obj))) (fn->binding obj)
-    (instance? StaticResourceBinding obj) (static-resources-binding (:url obj) (:path obj))
+    (instance? StaticResourceBinding obj) (static-resources-binding obj)
     :default []))
 
 (defn- bindings->array [bindings]

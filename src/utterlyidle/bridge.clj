@@ -36,10 +36,11 @@
 (defn path-param [name]
   (named-parameter PathParameters name))
 
-(defn static-resources-binding [url path]
-  (seq (.. (StaticBindingBuilder/in url)
-           (path path)
-           (call))))
+(defn static-resources-binding [binding]
+  (let [builder (.. (StaticBindingBuilder/in (:url binding)) (path (:path binding)))]
+    (do
+      (doall (map (fn [[extension media-type]] (.set builder extension media-type)) (:extensions binding)))
+      (seq (.call builder)))))
 
 (defn value-resolver [value]
   (reify Resolver
