@@ -6,7 +6,7 @@
   "Creates new testing server context for given bindings and invokes body within it.
   Use 'client' binding to query the server."
   [bindings & body]
-  `(let [server# (start-server {} ~bindings)
+  `(let [server# (apply start-server (cons {} (flatten [~bindings])))
          ~'client (.application (:server server#))]
      (try ~@body
           (finally (stop-server server#)))))

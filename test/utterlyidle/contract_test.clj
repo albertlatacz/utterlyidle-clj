@@ -1,21 +1,22 @@
 (ns utterlyidle.contract_test
-  (:import (com.googlecode.utterlyidle MediaType))
+  (:import (com.googlecode.utterlyidle MediaType RequestBuilder))
   (:require [clojure.test :refer :all]
             [utterlyidle.bindings :refer :all]
             [utterlyidle.media-types :refer :all]
             [utterlyidle.server :refer :all]
+            [utterlyidle.testing :refer :all]
             [utterlyidle.client :as client])
   (:refer-clojure :exclude (get)))
 
 (defn test-server [f]
   (def testServer
     (start-server {:port 9000 :base-path "/test-server"}
-      (with-resources-in-ns 'utterlyidle.contract_test)
-      (with-static-resources-in
-        (package-url 'utterlyidle.testdata.bindings)
-        "static"
-        :extensions {"ping" MediaType/IMAGE_PNG})
-      (with-application-scoped {:application-scoped "app scoped"})))
+                  (with-resources-in-ns 'utterlyidle.contract_test)
+                  (with-static-resources-in
+                    (package-url 'utterlyidle.testdata.bindings)
+                    "static"
+                    :extensions {"ping" MediaType/IMAGE_PNG})
+                  (with-application-scoped {:application-scoped "app scoped"})))
   (f)
   (stop-server testServer))
 
@@ -66,12 +67,12 @@
 
 (deftest supports-post-with-body
   (let [path "/post-with-body"]
-    (is (= (:body (client/post  (test-url path) "application/xml" "<helloThere/>")) "POST <helloThere/>"))))
+    (is (= (:body (client/post (test-url path) "application/xml" "<helloThere/>")) "POST <helloThere/>"))))
 
 
 (defresource binding-with-different-parameters [:get "/binding-with-different-parameters/{path-param}"]
   {:query-params [query-param]
-   :path-params [path-param]}
+   :path-params  [path-param]}
   (str "GET " query-param " " path-param))
 
 (deftest supports-different-parameters
@@ -89,3 +90,19 @@
 (deftest supports-static-resources
   (let [path "/static/test.ping"]
     (is (= (-> (client/get (test-url path)) :status :code) 200))))
+
+
+
+(deftest testing-server-works-for-multiple-bindings
+  (testing-server [(with-application-scoped {:a-value "some value"})
+                   (with-resource :get "/" {:scoped-params {:a-value some-val}}
+                                  (fn [some-val] (str "TEST " some-val)))]
+    (is (= (.. client (handle (.build (RequestBuilder/get "/"))) (entity) (toString))
+           "TEST some value"))))
+
+
+
+(deftest testing-server-works-for-single-binding
+  (testing-server (with-resource :get "/" {} (fn [] "TEST"))
+    (is (= (.. client (handle (.build (RequestBuilder/get "/"))) (entity) (toString))
+           "TEST"))))
