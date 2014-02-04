@@ -7,7 +7,7 @@
 
 
 (defn map-values [f m]
-  (into {} (map (fn[[k v]] [k (f v)]) m)))
+  (into {} (map (fn [[k v]] [k (f v)]) m)))
 
 (defn- functions-in-namespace [ns]
   (require ns)
@@ -39,10 +39,10 @@
    :path-params    (:path-params (nth args 2))
    :header-params  (:header-params (nth args 2))
    :cookie-params  (:cookie-params (nth args 2))
-   :request-params (vec (:as (nth args 2)))
-   :consumes       (mapv eval (:consumes (nth args 2)))
-   :produces       (mapv eval (:produces (nth args 2)))
-   :scoped-params  (vec (map (fn [[x y]] [x y]) (:scoped-params (nth args 2))))
+   :request-params (:as (nth args 2))
+   :consumes       (:consumes (nth args 2))
+   :produces       (:produces (nth args 2))
+   :scoped-params  (:scoped-params (nth args 2))
    :body           (drop 3 args)})
 
 (defn- package-root [ns]
@@ -66,21 +66,21 @@
 (defrecord ScopedParameterBinding [name value])
 
 (defn bind-function [func method path consumes produces query-params form-params path-params header-params cookie-params request-params scoped-params args]
-  (with-meta func
-             (assoc (meta func)
-               :binding (ResourceBinding.
-                          method
-                          path
-                          (resolve-media-types consumes)
-                          (resolve-media-types produces)
-                          query-params
-                          form-params
-                          path-params
-                          header-params
-                          cookie-params
-                          request-params
-                          scoped-params
-                          args))))
+  (vary-meta
+    func assoc
+    :binding (ResourceBinding.
+               (eval method)
+               (eval path)
+               (resolve-media-types (mapv eval consumes))
+               (resolve-media-types (mapv eval produces))
+               query-params
+               form-params
+               path-params
+               header-params
+               cookie-params
+               (vec request-params)
+               (vec (map (fn [[x y]] [x y]) scoped-params))
+               args)))
 
 (defn with-resources-in-ns
   "Returns all binded resources in given namespace."
@@ -127,7 +127,7 @@
        ~(mapv name header-params)
        ~(mapv name cookie-params)
        ~(mapv name as)
-       ~(map-values (fn[p] (name p)) scoped-params)
+       ~(map-values (fn [p] (name p)) scoped-params)
        ~(extract-args function))))
 
 (defmacro defresource

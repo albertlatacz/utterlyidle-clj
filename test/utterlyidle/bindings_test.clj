@@ -31,7 +31,7 @@
                      ["header-param"]
                      ["cookie-param"]
                      ["request"]
-                     {:foo "foo"}
+                     [[:foo "foo"]]
                      [["request" "name"]])})))
 
 (deftest use-default-media-types-for-produces-and-consumes
@@ -47,7 +47,7 @@
                      []
                      []
                      []
-                     {}
+                     []
                      [[]])})))
 
 
