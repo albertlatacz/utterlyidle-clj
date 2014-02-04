@@ -40,8 +40,8 @@
    :header-params  (:header-params (nth args 2))
    :cookie-params  (:cookie-params (nth args 2))
    :request-params (vec (:as (nth args 2)))
-   :consumes       (:consumes (nth args 2))
-   :produces       (:produces (nth args 2))
+   :consumes       (mapv eval (:consumes (nth args 2)))
+   :produces       (mapv eval (:produces (nth args 2)))
    :scoped-params  (vec (map (fn [[x y]] [x y]) (:scoped-params (nth args 2))))
    :body           (drop 3 args)})
 

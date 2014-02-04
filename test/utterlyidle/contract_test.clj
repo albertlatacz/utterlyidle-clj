@@ -2,6 +2,7 @@
   (:import (com.googlecode.utterlyidle MediaType))
   (:require [clojure.test :refer :all]
             [utterlyidle.bindings :refer :all]
+            [utterlyidle.media-types :refer :all]
             [utterlyidle.server :refer :all]
             [utterlyidle.client :as client])
   (:refer-clojure :exclude (get)))
@@ -32,6 +33,15 @@
   (let [path "/get-with-query-param"]
     (is (= (:body (client/get (test-url path) {:param "Hello there"})) "GET Hello there"))))
 
+
+(defresource get-binding-different-produces-and-consumes [:get "/get-with-prod-cons"]
+  {:consumes [wildcard]
+   :produces [text-plain]}
+  (str "GET CONSUMING '" wildcard "' AND PRODUCING '" text-plain "'"))
+
+(deftest supports-binding-different-produces-and-consumes
+  (let [path "/get-with-prod-cons"]
+    (is (= (:body (client/get (test-url path))) "GET CONSUMING '*/*' AND PRODUCING 'text/plain'"))))
 
 
 (defresource get-binding-without-parameter [:get "/get-without-param"] {}

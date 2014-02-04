@@ -3,6 +3,7 @@
            [utterlyidle.bindings ResourceBinding StaticResourceBinding])
   (:require [clojure.test :refer :all]
             [utterlyidle.bindings :refer :all]
+            [utterlyidle.media-types :refer :all]
             [utterlyidle.testdata.bindings :refer :all]
             [utterlyidle.testdata.subns.bindings_in_subns :refer :all]))
 
@@ -16,14 +17,14 @@
 
 (deftest binds-fn-correctly
   (is (= (do (meta (with-resource :get "/test"
-                                  {:consumes      ["consumes"] :produces ["produces"] :query-params [query-param]
+                                  {:consumes      [application-json] :produces [application-xml] :query-params [query-param]
                                    :form-params   [form-param] :path-params [path-param] :cookie-params [cookie-param]
                                    :header-params [header-param] :scoped-params {:foo foo} :as [request]} (fn [request name] name))))
          {:binding (ResourceBinding.
                      :get
                      "/test"
-                     ["consumes"]
-                     ["produces"]
+                     [application-json]
+                     [application-xml]
                      ["query-param"]
                      ["form-param"]
                      ["path-param"]
