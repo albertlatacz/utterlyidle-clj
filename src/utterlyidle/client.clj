@@ -42,7 +42,7 @@
   (-> (.handle client (map->request {:request (merge {:method method :uri uri} (dissoc request :client))}))
       (response->map)))
 
-(defn- as-params [params]
+(defn- filter-empty-pairs [params]
   (reduce concat (remove (comp nil? second) params)))
 
 (defn- url-encode
@@ -60,22 +60,22 @@
 
 
 (defn GET [uri & {:keys [headers body client] :as request}]
-  (apply make-request HttpMethod/GET uri (as-params request)))
+  (apply make-request HttpMethod/GET uri (filter-empty-pairs request)))
 
 (defn POST [uri & {:keys [headers body client] :as request}]
-  (apply make-request HttpMethod/POST uri (as-params request)))
+  (apply make-request HttpMethod/POST uri (filter-empty-pairs request)))
 
 (defn PUT [uri & {:keys [headers body client] :as request}]
-  (apply make-request HttpMethod/PUT uri (as-params request)))
+  (apply make-request HttpMethod/PUT uri (filter-empty-pairs request)))
 
 (defn DELETE [uri & {:keys [headers body client] :as request}]
-  (apply make-request HttpMethod/DELETE uri (as-params request)))
+  (apply make-request HttpMethod/DELETE uri (filter-empty-pairs request)))
 
 (defn HEAD [uri & {:keys [headers body client] :as request}]
-  (apply make-request HttpMethod/HEAD uri (as-params request)))
+  (apply make-request HttpMethod/HEAD uri (filter-empty-pairs request)))
 
 (defn OPTIONS [uri & {:keys [headers body client] :as request}]
-  (apply make-request HttpMethod/OPTIONS uri (as-params request)))
+  (apply make-request HttpMethod/OPTIONS uri (filter-empty-pairs request)))
 
 
 (defn uri [base & {:keys [params encoding]}]

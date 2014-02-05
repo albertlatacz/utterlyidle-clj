@@ -17,5 +17,3 @@
 (deftest creating-form-parameters-with-different-encoding
   (is (= (form :encoding "UTF-16" :params {:param "multi\nline val" "list" [1 2]})
          "param=multi%FE%FF%00%0Aline+val&list=1&list=2")))
-
-
