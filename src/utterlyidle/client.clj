@@ -2,9 +2,11 @@
   (:import [com.googlecode.utterlyidle RequestBuilder FormParameters Response Request Requests HeaderParameters]
            [com.googlecode.utterlyidle.handlers ClientHttpHandler]
            (com.googlecode.utterlyidle.annotations HttpMethod)
-           (com.googlecode.totallylazy Uri Pair))
+           (com.googlecode.totallylazy Uri Pair)
+           (java.net URLEncoder))
   (:refer-clojure :exclude [get])
-  (:require [utterlyidle.bridge :refer :all]))
+  (:require [clojure.string :refer [join]]
+            [utterlyidle.bridge :refer :all]))
 
 (defn- header-parameters->vec [headers]
   (vec (map #(vector (.first %) (.second %)) headers)))
@@ -15,17 +17,17 @@
 
 (defn- response->map [^Response response]
   {:response
-   {:status {:code (.. response (status) (code))
-             :description (.. response (status) (description))}
-    :headers (header-parameters->vec (.headers response))
-    :entity (.. response (entity) (toString))}})
+    {:status  {:code        (.. response (status) (code))
+               :description (.. response (status) (description))}
+     :headers (header-parameters->vec (.headers response))
+     :entity  (.. response (entity) (toString))}})
 
 (defn- request->map [^Request request]
   {:request
-   {:method (.method request)
-    :uri (.. request (uri) (toString))
-    :entity (.. request (entity) (toString))
-    :headers (header-parameters->vec (.headers request))}})
+    {:method  (.method request)
+     :uri     (.. request (uri) (toString))
+     :entity  (.. request (entity) (toString))
+     :headers (header-parameters->vec (.headers request))}})
 
 (defn- map->request [request-map]
   (Requests/request (get-in request-map [:request :method])
@@ -42,6 +44,19 @@
 
 (defn- as-params [params]
   (reduce concat (remove (comp nil? second) params)))
+
+(defn- url-encode
+  [unencoded & [encoding]]
+  (URLEncoder/encode unencoded (or encoding "UTF-8")))
+
+
+(defn- as-request-params [params encoding]
+  (letfn [(param-name [param]
+                      (if (keyword? param) (name param) (str param)))
+          (explode-params [[name values]]
+                          (map #(str (param-name name) "=" (url-encode (str %) encoding))
+                               (flatten (vector values))))]
+    (join "&" (mapcat explode-params params))))
 
 
 (defn GET [uri & {:keys [headers body client] :as request}]
@@ -61,6 +76,16 @@
 
 (defn OPTIONS [uri & {:keys [headers body client] :as request}]
   (apply make-request HttpMethod/OPTIONS uri (as-params request)))
+
+
+(defn uri [base & {:keys [params encoding]}]
+  (let [query-params (as-request-params params encoding)]
+    (if-not (empty? query-params)
+      (str base "?" query-params)
+      base)))
+
+(defn form [& {:keys [params encoding]}]
+  (as-request-params params encoding))
 
 
 (defn entity [response]
