@@ -4,9 +4,9 @@
             [utterlyidle.bindings :refer :all]
             [utterlyidle.media-types :refer :all]
             [utterlyidle.server :refer :all]
+            [utterlyidle.headers :refer :all]
             [utterlyidle.testing :refer :all]
-            [utterlyidle.client :as client])
-  (:refer-clojure :exclude (get)))
+            [utterlyidle.client :refer :all]))
 
 (defn test-server [f]
   (def testServer
@@ -17,7 +17,8 @@
                     "static"
                     :extensions {"ping" MediaType/IMAGE_PNG})
                   (with-application-scoped {:application-scoped "app scoped"})))
-  (f)
+  (binding [client-http-handler (fn [] (.application (:server testServer)))]
+    (f))
   (stop-server testServer))
 
 (use-fixtures :once test-server)
@@ -25,14 +26,14 @@
 
 
 (defn test-url [path]
-  (str "http://localhost:9000/test-server" path))
+  (str "/test-server" path))
 
 (defresource get-binding-with-parameter [:get "/get-with-query-param"] {:query-params [param]}
   (str "GET " param))
 
 (deftest supports-get-with-parameters
-  (let [path "/get-with-query-param"]
-    (is (= (:body (client/get (test-url path) {:param "Hello there"})) "GET Hello there"))))
+  (is (= (-> (GET "/get-with-query-param?param=Hello%20there") (entity))
+         "GET Hello there")))
 
 
 (defresource get-binding-different-produces-and-consumes [:get "/get-with-prod-cons"]
@@ -41,68 +42,65 @@
   (str "GET CONSUMING '" wildcard "' AND PRODUCING '" text-plain "'"))
 
 (deftest supports-binding-different-produces-and-consumes
-  (let [path "/get-with-prod-cons"]
-    (is (= (:body (client/get (test-url path))) "GET CONSUMING '*/*' AND PRODUCING 'text/plain'"))))
+  (is (= (-> (GET "/get-with-prod-cons") (entity))
+         "GET CONSUMING '*/*' AND PRODUCING 'text/plain'")))
 
 
 (defresource get-binding-without-parameter [:get "/get-without-param"] {}
   (str "GET"))
 
 (deftest supports-get-without-parameters
-  (let [path "/get-without-param"]
-    (is (= (:body (client/get (test-url path))) "GET"))))
-
+  (is (= (-> (GET "/get-without-param") (entity))
+         "GET")))
 
 
 (defresource post-binding-with-form-parameter [:post "/post-with-form-param"] {:form-params [param]}
   (str "POST " param))
 
 (deftest supports-post-with-form-parameters
-  (let [path "/post-with-form-param"]
-    (is (= (:body (client/post (test-url path) {:param "Hello there"})) "POST Hello there"))))
+  (is (= (-> (POST "/post-with-form-param" :headers {Content-Type application-form-urlencoded} :entity "param=Hello there") (entity))
+         "POST Hello there")))
 
 
 (defresource post-binding-with-body [:post "/post-with-body"] {:as [request]}
   (str "POST " (.entity request)))
 
 (deftest supports-post-with-body
-  (let [path "/post-with-body"]
-    (is (= (:body (client/post (test-url path) "application/xml" "<helloThere/>")) "POST <helloThere/>"))))
+  (is (= (-> (POST "/post-with-body" :headers {Content-Type application-xml} :entity "<helloThere/>") (entity))
+         "POST <helloThere/>")))
 
 
 (defresource binding-with-different-parameters [:get "/binding-with-different-parameters/{path-param}"]
   {:query-params [query-param]
-   :path-params  [path-param]}
+   :path-params [path-param]}
   (str "GET " query-param " " path-param))
 
 (deftest supports-different-parameters
-  (let [path "/binding-with-different-parameters/there"]
-    (is (= (:body (client/get (test-url path) {:query-param "Hello"})) "GET Hello there"))))
+  (is (= (-> (GET "/binding-with-different-parameters/there?query-param=Hello") (entity))
+         "GET Hello there")))
 
 (defresource binding-with-application-scoped [:get "/binding-with-application-scoped"]
   {:scoped-params {:application-scoped app-scoped}}
   (str "GET SCOPED " app-scoped))
 
 (deftest supports-application-scoping
-  (let [path "/binding-with-application-scoped"]
-    (is (= (:body (client/get (test-url path))) "GET SCOPED app scoped"))))
+  (is (= (-> (GET "/binding-with-application-scoped") (entity))
+         "GET SCOPED app scoped")))
 
 (deftest supports-static-resources
-  (let [path "/static/test.ping"]
-    (is (= (-> (client/get (test-url path)) :status :code) 200))))
-
+  (is (= (-> (GET "/static/test.ping") (status-code))
+         200)))
 
 
 (deftest testing-server-works-for-multiple-bindings
   (testing-server [(with-application-scoped {:a-value "some value"})
                    (with-resource :get "/" {:scoped-params {:a-value some-val}}
                                   (fn [some-val] (str "TEST " some-val)))]
-    (is (= (.. client (handle (.build (RequestBuilder/get "/"))) (entity) (toString))
+    (is (= (-> (GET "/") (entity))
            "TEST some value"))))
-
 
 
 (deftest testing-server-works-for-single-binding
   (testing-server (with-resource :get "/" {} (fn [] "TEST"))
-    (is (= (.. client (handle (.build (RequestBuilder/get "/"))) (entity) (toString))
+    (is (= (-> (GET "/") (entity))
            "TEST"))))

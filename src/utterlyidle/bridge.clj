@@ -1,7 +1,7 @@
 (ns utterlyidle.bridge
-  (:import (com.googlecode.totallylazy Pair Option Sequences)
+  (:import (com.googlecode.totallylazy Pair Option Sequences Uri)
            (com.googlecode.utterlyidle NamedParameter QueryParameters FormParameters HeaderParameters PathParameters
-                                       Request Binding UriTemplate Application ParametersExtractor)
+                                       Request Binding UriTemplate Application ParametersExtractor Response Requests)
            (com.googlecode.utterlyidle.cookies CookieParameters)
            (java.lang.reflect ParameterizedType Type)
            (com.googlecode.utterlyidle.bindings.actions Action)
@@ -9,8 +9,7 @@
            (com.googlecode.utterlyidle.dsl DefinedParameter StaticBindingBuilder)
            (com.googlecode.utterlyidle.bindings MatchedBinding)
            (com.googlecode.yadic Resolver))
-  (:require [clojure.set :refer [map-invert]])
-  )
+  (:require [clojure.set :refer [map-invert]]))
 
 (defn- as-sequence [coll]
   (.. (Sequences/sequence) (join coll)))
