@@ -10,22 +10,22 @@
             [utterlyidle.bridge :refer :all]
             [utterlyidle.bindings :refer :all]))
 
-(defn GET [uri & {:keys [headers body client] :as request}]
+(defn GET [uri & {:keys [headers entity client] :as request}]
   (apply make-request HttpMethod/GET uri (filter-empty-pairs request)))
 
-(defn POST [uri & {:keys [headers body client] :as request}]
+(defn POST [uri & {:keys [headers entity client] :as request}]
   (apply make-request HttpMethod/POST uri (filter-empty-pairs request)))
 
-(defn PUT [uri & {:keys [headers body client] :as request}]
+(defn PUT [uri & {:keys [headers entity client] :as request}]
   (apply make-request HttpMethod/PUT uri (filter-empty-pairs request)))
 
-(defn DELETE [uri & {:keys [headers body client] :as request}]
+(defn DELETE [uri & {:keys [headers entity client] :as request}]
   (apply make-request HttpMethod/DELETE uri (filter-empty-pairs request)))
 
-(defn HEAD [uri & {:keys [headers body client] :as request}]
+(defn HEAD [uri & {:keys [headers entity client] :as request}]
   (apply make-request HttpMethod/HEAD uri (filter-empty-pairs request)))
 
-(defn OPTIONS [uri & {:keys [headers body client] :as request}]
+(defn OPTIONS [uri & {:keys [headers entity client] :as request}]
   (apply make-request HttpMethod/OPTIONS uri (filter-empty-pairs request)))
 
 

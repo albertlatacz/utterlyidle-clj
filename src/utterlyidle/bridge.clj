@@ -82,7 +82,7 @@
 (defn ^:dynamic client-http-handler []
   (ClientHttpHandler.))
 
-(defn make-request [method uri & {:keys [headers body client] :or {client (client-http-handler)} :as req}]
+(defn make-request [method uri & {:keys [headers entity client] :or {client (client-http-handler)} :as req}]
   (-> (.handle client (map->request (request (merge {:method method :uri uri} (dissoc req :client)))))
       (response->map)))
 

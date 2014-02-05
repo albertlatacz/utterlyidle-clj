@@ -18,6 +18,7 @@
                     :extensions {"ping" MediaType/IMAGE_PNG})
                   (with-application-scoped {:application-scoped "app scoped"})))
   (binding [client-http-handler (fn [] (.application (:server testServer)))]
+    ;(println (fpp))
     (f))
   (stop-server testServer))
 
