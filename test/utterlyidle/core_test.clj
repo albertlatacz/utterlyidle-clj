@@ -1,6 +1,6 @@
-(ns utterlyidle.client-test
+(ns utterlyidle.core-test
   (:require [clojure.test :refer :all]
-            [utterlyidle.client :refer :all]))
+            [utterlyidle.core :refer :all]))
 
 (deftest creating-simple-uri-without-params
   (is (= (uri "http://www.domain.com")

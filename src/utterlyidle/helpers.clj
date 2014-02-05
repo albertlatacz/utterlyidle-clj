@@ -1,17 +1,33 @@
-(ns utterlyidle.server
+(ns utterlyidle.helpers
   (:import [utterlyidle.bindings ResourceBinding StaticResourceBinding ScopedParameterBinding]
            [com.googlecode.utterlyidle Binding BasePath RestApplication ServerConfiguration]
            [com.googlecode.utterlyidle.httpserver RestServer]
            [com.googlecode.utterlyidle.modules Modules]
-           (java.net InetAddress))
+           (java.net InetAddress URLEncoder))
 
   (:require [clojure.tools.namespace :refer :all]
             [utterlyidle.bridge :refer :all]
             [utterlyidle.bindings :refer :all]
-            [clojure.java.io :refer [file]]))
+            [clojure.java.io :refer [file]]
+            [clojure.string :refer [join]]))
+
+(defn url-encode
+  [unencoded & [encoding]]
+  (URLEncoder/encode unencoded (or encoding "UTF-8")))
+
+(defn filter-empty-pairs [params]
+  (reduce concat (remove (comp nil? second) params)))
 
 
-(defn- binding->params [binding]
+(defn as-request-params [params encoding]
+  (letfn [(param-name [param]
+                      (if (keyword? param) (name param) (str param)))
+          (explode-params [[name values]]
+                          (map #(str (param-name name) "=" (url-encode (str %) encoding))
+                               (flatten (vector values))))]
+    (join "&" (mapcat explode-params params))))
+
+(defn binding->params [binding]
   (let [{:keys [query-params form-params cookie-params header-params path-params request-params]} binding]
     (keep identity
           (map
@@ -25,7 +41,7 @@
                 (some #{arg} path-params) (path-param arg)))
             (first (:arguments binding))))))
 
-(defn- fn->binding [func]
+(defn fn->binding [func]
   (let [binding (:binding (meta func))]
     (vector
       (create-binding
@@ -36,34 +52,12 @@
         func
         (binding->params binding)))))
 
-(defn- as-binding [obj]
+(defn as-binding [obj]
   (cond
     (instance? ResourceBinding (:binding (meta obj))) (fn->binding obj)
     (instance? StaticResourceBinding obj) (static-resources-binding obj)
     :default []))
 
-(defn- bindings->array [bindings]
+(defn bindings->array [bindings]
   (into-array ^Binding (mapcat as-binding (flatten bindings))))
 
-
-(defn start-server
-  "Starts server with specified resource bindings.
-  e.g (start-server {:port 8080 :base-path \"/\"
-      (with-resources-in-dir \"src/clojure/utterlyidle/example\"))"
-  [{:keys [port base-path max-threads bind-address] :or {port 0, base-path "/", max-threads 50, bind-address "0.0.0.0"}} & bindings]
-  (let [config (.. (ServerConfiguration.)
-                   (port port)
-                   (maxThreadNumber max-threads)
-                   (bindAddress (InetAddress/getByName bind-address))
-                   (basePath (BasePath/basePath base-path)))
-        application (RestApplication. (BasePath/basePath base-path))]
-    (.. application (add (Modules/bindingsModule (bindings->array bindings))))
-    (let [x (filter #(instance? ScopedParameterBinding %) (flatten bindings))]
-      (doseq [param x]
-        (.. application
-            (applicationScope)
-            (addType (custom-type (name (:name param))) (value-resolver (:value param))))))
-    {:server (RestServer. application config)}))
-
-(defn stop-server [server]
-  (.close (:server server)))

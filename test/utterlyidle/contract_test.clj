@@ -3,10 +3,10 @@
   (:require [clojure.test :refer :all]
             [utterlyidle.bindings :refer :all]
             [utterlyidle.media-types :refer :all]
-            [utterlyidle.server :refer :all]
+            [utterlyidle.core :refer :all]
             [utterlyidle.headers :refer :all]
             [utterlyidle.testing :refer :all]
-            [utterlyidle.client :refer :all]))
+            [utterlyidle.bridge :refer :all]))
 
 (defn test-server [f]
   (def testServer
@@ -63,7 +63,7 @@
 
 
 (defresource post-binding-with-body [:post "/post-with-body"] {:as [request]}
-  (str "POST " (.entity request)))
+  (str "POST " (entity request)))
 
 (deftest supports-post-with-body
   (is (= (-> (POST "/post-with-body" :headers {Content-Type application-xml} :entity "<helloThere/>") (entity))
