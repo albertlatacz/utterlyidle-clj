@@ -121,7 +121,7 @@
   (reify ParameterizedType
     (hashCode [this] (.hashCode name))
     (equals [this other] (.equals name other))
-    (toString [this] (str "Custom type [" name "]"))
+    (toString [this] name)
     (getActualTypeArguments [this] (into-array Type []))
     (getRawType [this] (class this))
     (getOwnerType [this] (class this))))
