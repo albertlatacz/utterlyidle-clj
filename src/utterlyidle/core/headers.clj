@@ -1,4 +1,4 @@
-(ns utterlyidle.headers)
+(ns utterlyidle.core)
 
 (def Accept "Accept")
 (def Accept-Charset "Accept-Charset")

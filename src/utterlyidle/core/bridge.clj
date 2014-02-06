@@ -1,4 +1,4 @@
-(ns utterlyidle.bridge
+(ns utterlyidle.core.bridge
   (:import (com.googlecode.totallylazy Pair Option Sequences Uri)
            (com.googlecode.utterlyidle NamedParameter QueryParameters FormParameters HeaderParameters PathParameters
                                        Request Binding UriTemplate Application ParametersExtractor Response Requests

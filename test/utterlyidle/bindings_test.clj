@@ -1,9 +1,8 @@
 (ns utterlyidle.bindings_test
   (:import [java.net URL]
-           [utterlyidle.bindings ResourceBinding StaticResourceBinding])
+           [utterlyidle.core ResourceBinding StaticResourceBinding])
   (:require [clojure.test :refer :all]
-            [utterlyidle.bindings :refer :all]
-            [utterlyidle.media-types :refer :all]
+            [utterlyidle.core :refer :all]
             [utterlyidle.testdata.bindings :refer :all]
             [utterlyidle.testdata.subns.bindings_in_subns :refer :all]))
 

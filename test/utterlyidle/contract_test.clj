@@ -1,12 +1,8 @@
 (ns utterlyidle.contract_test
   (:import (com.googlecode.utterlyidle MediaType RequestBuilder))
   (:require [clojure.test :refer :all]
-            [utterlyidle.bindings :refer :all]
-            [utterlyidle.media-types :refer :all]
             [utterlyidle.core :refer :all]
-            [utterlyidle.headers :refer :all]
-            [utterlyidle.testing :refer :all]
-            [utterlyidle.bridge :refer :all]))
+            [utterlyidle.core.bridge :refer :all]))
 
 (defn test-server [f]
   (def testServer
@@ -18,7 +14,7 @@
                     :extensions {"ping" MediaType/IMAGE_PNG})
                   (with-application-scoped {:application-scoped "app scoped"})))
   (binding [client-http-handler (fn [] (.application (:server testServer)))]
-    ;(println (fpp))
+
     (f))
   (stop-server testServer))
 

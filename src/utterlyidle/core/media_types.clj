@@ -1,4 +1,4 @@
-(ns utterlyidle.media-types)
+(ns utterlyidle.core)
 
 (def wildcard "*/*")
 (def application-xml "application/xml")

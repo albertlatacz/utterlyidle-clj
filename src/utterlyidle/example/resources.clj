@@ -1,5 +1,5 @@
 (ns utterlyidle.example.resources
-  (:require [utterlyidle.bindings :refer :all]))
+  (:require [utterlyidle.core :refer :all]))
 
 (defresource test-binding [:get "/test-binding"] {}
   "GET SIMPLE")

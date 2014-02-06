@@ -1,10 +1,8 @@
-(ns utterlyidle.bindings
-  (:gen-class)
-  (:import (com.googlecode.utterlyidle.dsl StaticBindingBuilder))
-  (:require [clojure.tools.namespace :refer :all]
-
-            [clojure.java.io :refer [file as-url resource]]
+(ns utterlyidle.core
+  (:require [clojure.java.io :refer [file as-url resource]]
             [clojure.string :refer [join split]]))
+
+(use '[clojure.tools.namespace :refer [find-namespaces-in-dir]])
 
 (defn map-values [f m]
   (into {} (map (fn [[k v]] [k (f v)]) m)))
