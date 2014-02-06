@@ -1,11 +1,9 @@
 (ns utterlyidle.core
   (:require [clojure.java.io :refer [file as-url resource]]
-            [clojure.string :refer [join split]]))
+            [clojure.string :refer [join split]]
+            [utterlyidle.core.utils :refer :all]))
 
 (use '[clojure.tools.namespace :refer [find-namespaces-in-dir]])
-
-(defn map-values [f m]
-  (into {} (map (fn [[k v]] [k (f v)]) m)))
 
 (defn- functions-in-namespace [ns]
   (require ns)
@@ -150,5 +148,3 @@
           [(mapv name fn-params)])
        ~(vec fn-params)
        ~@body)))
-
-

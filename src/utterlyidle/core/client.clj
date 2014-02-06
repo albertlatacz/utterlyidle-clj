@@ -1,16 +1,14 @@
 (ns utterlyidle.core
   (:import (com.googlecode.utterlyidle.annotations HttpMethod)
-           (java.net URLEncoder))
-  (:require [clojure.string :refer [join]]
-            [utterlyidle.core.bridge :refer :all]))
+           (java.net URLEncoder)
+           (com.googlecode.utterlyidle.handlers ClientHttpHandler)
+           (com.googlecode.utterlyidle Requests Response HeaderParameters)
+           (com.googlecode.totallylazy Uri Pair))
+  (:require [utterlyidle.core.utils :refer :all]
+            [clojure.string :refer [join]]))
 
-
-(defn- url-encode
-  [unencoded & [encoding]]
-  (URLEncoder/encode unencoded (or encoding "UTF-8")))
-
-(defn- filter-empty-pairs [params]
-  (reduce concat (remove (comp nil? second) params)))
+(defn ^:dynamic client-http-handler []
+  (ClientHttpHandler.))
 
 (defn- as-request-params [params encoding]
   (letfn [(param-name [param]
@@ -19,6 +17,10 @@
                           (map #(str (param-name name) "=" (url-encode (str %) encoding))
                                (flatten (vector values))))]
     (join "&" (mapcat explode-params params))))
+
+(defn- make-request [method uri & {:keys [headers entity client] :or {client (client-http-handler)} :as req}]
+  (-> (.handle client (map->request {:request (merge {:method method :uri uri} (dissoc req :client))}))
+      (response->map)))
 
 
 (defn GET [uri & {:keys [headers entity client] :as request}]

@@ -1,4 +1,4 @@
-(ns utterlyidle.bindings_test
+(ns utterlyidle.bindings-test
   (:import [java.net URL]
            [utterlyidle.core ResourceBinding StaticResourceBinding])
   (:require [clojure.test :refer :all]

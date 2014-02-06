@@ -1,8 +1,7 @@
 (ns utterlyidle.contract_test
   (:import (com.googlecode.utterlyidle MediaType RequestBuilder))
   (:require [clojure.test :refer :all]
-            [utterlyidle.core :refer :all]
-            [utterlyidle.core.bridge :refer :all]))
+            [utterlyidle.core :refer :all]))
 
 (defn test-server [f]
   (def testServer
