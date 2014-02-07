@@ -15,9 +15,7 @@
            (com.googlecode.utterlyidle.bindings MatchedBinding)
            (clojure.lang IFn)
            (com.googlecode.utterlyidle.bindings.actions Action))
-  (:require [clojure.set :refer [map-invert]]
-            [clojure.string :refer [join]]
-            [utterlyidle.core.utils :refer :all]))
+  (:require [utterlyidle.core.utils :refer :all]))
 
 
 (defn- named-parameter [parameter-type name]

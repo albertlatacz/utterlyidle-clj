@@ -50,9 +50,6 @@
 (defn filter-empty-pairs [params]
   (reduce concat (remove (comp nil? second) params)))
 
-(defn url-encode
-  [unencoded & [encoding]]
-  (URLEncoder/encode unencoded (or encoding "UTF-8")))
 
 (defn map-values [f m]
   (into {} (map (fn [[k v]] [k (f v)]) m)))

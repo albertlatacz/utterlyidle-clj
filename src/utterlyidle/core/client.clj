@@ -4,24 +4,14 @@
            (com.googlecode.utterlyidle.handlers ClientHttpHandler)
            (com.googlecode.utterlyidle Requests Response HeaderParameters)
            (com.googlecode.totallylazy Uri Pair))
-  (:require [utterlyidle.core.utils :refer :all]
-            [clojure.string :refer [join]]))
+  (:require [utterlyidle.core.utils :refer :all]))
 
 (defn ^:dynamic client-http-handler []
   (ClientHttpHandler.))
 
-(defn- as-request-params [params encoding]
-  (letfn [(param-name [param]
-                      (if (keyword? param) (name param) (str param)))
-          (explode-params [[name values]]
-                          (map #(str (param-name name) "=" (url-encode (str %) encoding))
-                               (flatten (vector values))))]
-    (join "&" (mapcat explode-params params))))
-
 (defn- make-request [method uri & {:keys [headers entity client] :or {client (client-http-handler)} :as req}]
   (-> (.handle client (map->request {:request (merge {:method method :uri uri} (dissoc req :client))}))
       (response->map)))
-
 
 (defn GET [uri & {:keys [headers entity client] :as request}]
   (apply make-request HttpMethod/GET uri (filter-empty-pairs request)))
@@ -41,12 +31,3 @@
 (defn OPTIONS [uri & {:keys [headers entity client] :as request}]
   (apply make-request HttpMethod/OPTIONS uri (filter-empty-pairs request)))
 
-
-(defn uri [base & {:keys [params encoding]}]
-  (let [query-params (as-request-params params encoding)]
-    (if-not (empty? query-params)
-      (str base "?" query-params)
-      base)))
-
-(defn form [& {:keys [params encoding]}]
-  (as-request-params params encoding))
