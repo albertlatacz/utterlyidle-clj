@@ -53,3 +53,8 @@
 
 (defn map-values [f m]
   (into {} (map (fn [[k v]] [k (f v)]) m)))
+
+(defn single-or-coll [x]
+  (if (and (coll? x) (= (count x) 1))
+    (first x)
+    x))

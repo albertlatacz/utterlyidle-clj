@@ -1,11 +1,15 @@
 (ns utterlyidle.core
-  (:import (java.net URLEncoder))
-  (:require [clojure.string :refer [join]]))
+  (:import (java.net URLEncoder URLDecoder))
+  (:require [clojure.string :refer [join split]]
+            [utterlyidle.core.utils :refer :all]))
 
 (defn url-encode
   [unencoded & [encoding]]
   (URLEncoder/encode unencoded (or encoding "UTF-8")))
 
+(defn url-decode
+  [encoded & [encoding]]
+  (URLDecoder/decode encoded (or encoding "UTF-8")))
 
 (defn entity [object]
   (or (get-in object [:request :entity])
@@ -31,7 +35,24 @@
     (join "&" (mapcat explode-params params))))
 
 
+(defn parse-query [query & [encoding]]
+  (as-> query params
+        (split params #"&")
+        (map (comp (fn[x] (map #(url-decode % encoding) x))
+                   #(split % #"=")) params)
+        (group-by first params)
+        (map-values (comp single-or-coll
+                          #(mapv second %)) params)))
 
+(defn parse-uri [uri & [encoding]]
+  (let [RFC-3986 #"^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?"
+        uri-parts (re-find RFC-3986 uri)]
+    {:uri       (uri-parts 0)
+     :scheme    (uri-parts 1)
+     :authority (uri-parts 2)
+     :path      (uri-parts 3)
+     :query     (uri-parts 4)
+     :fragment  (uri-parts 5)}))
 
 
 (defn uri [base & {:keys [params encoding]}]
@@ -42,7 +63,6 @@
 
 (defn form [& {:keys [params encoding]}]
   (as-request-params params encoding))
-
 
 
 
