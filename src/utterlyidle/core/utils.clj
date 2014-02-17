@@ -26,10 +26,12 @@
      :headers (header-parameters->vec (.headers request))}})
 
 (defn map->response [response-map]
-  (Responses/response (Status/status (get-in response-map [:response :status :code])
-                                     (get-in response-map [:response :status :description]))
-                      (vec->header-parameters (get-in response-map [:response :headers]))
-                      (get-in response-map [:response :entity])))
+  (try
+    (Responses/response (Status/status (get-in response-map [:response :status :code])
+                                       (get-in response-map [:response :status :description]))
+                        (vec->header-parameters (get-in response-map [:response :headers]))
+                        (get-in response-map [:response :entity]))
+    (catch Exception e (throw (RuntimeException. (str "Couldn't create " (.getName Response) " from map " response-map))))))
 
 (defn response->map [^Response response]
   {:response

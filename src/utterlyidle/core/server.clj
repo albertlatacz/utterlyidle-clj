@@ -49,14 +49,6 @@
   (reify Resolver
     (resolve [this type] value)))
 
-(defn- custom-type [name]
-  (reify ParameterizedType
-    (hashCode [this] (.hashCode name))
-    (equals [this other] (.equals name other))
-    (toString [this] name)
-    (getActualTypeArguments [this] (into-array Type []))
-    (getRawType [this] (class this))
-    (getOwnerType [this] (class this))))
 
 (defn- as-action-params [params]
   (map #(cond
@@ -69,6 +61,13 @@
     (response? result) (map->response result)
     :default result))
 
+(defrecord CustomType [name]
+  Type
+  (toString [this] name))
+
+(defn- custom-type [name]
+  (CustomType. name))
+
 (defn- create-action []
   (reify Action
     (description [this] "Clojure Binding")
@@ -79,7 +78,7 @@
             binding (.. request-scope (get MatchedBinding) (value))
             [func & request-params] (seq (.. (ParametersExtractor. (.uriTemplate binding) application (.parameters binding))
                                              (extract request)))
-            scoped-params (map #(.resolve request-scope (custom-type (str (first %))))
+            scoped-params (map (fn[[k v]] (.resolve request-scope (custom-type (name k))))
                                (get-in (meta func) [:binding :scoped-params]))]
         (as-action-result
           (apply func (as-action-params (concat scoped-params request-params))))))))
@@ -150,7 +149,8 @@
       (doseq [param x]
         (.. application
             (applicationScope)
-            (addType (custom-type (name (:name param))) (value-resolver (:value param))))))
+            (addType (custom-type (name (:name param)))
+                     (value-resolver (:value param))))))
     {:server (RestServer. application config)}))
 
 

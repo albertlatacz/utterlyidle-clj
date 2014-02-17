@@ -8,6 +8,8 @@
   :repositories {"Dan Bodart" "http://repo.bodar.com.s3.amazonaws.com/"}
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/tools.namespace "0.2.4"]
-                 [com.googlecode.utterlyidle/utterlyidle "733"]]
+                 [com.googlecode.utterlyidle/utterlyidle "740"]
+                 [com.googlecode.yadic/yadic "171"]
+                 [com.googlecode.totallylazy/totallylazy "1171"]]
   :aot [utterlyidle.core utterlyidle.example.server]
   :main utterlyidle.example.server)
