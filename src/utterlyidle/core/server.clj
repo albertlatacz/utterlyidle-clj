@@ -78,7 +78,7 @@
             binding (.. request-scope (get MatchedBinding) (value))
             [func & request-params] (seq (.. (ParametersExtractor. (.uriTemplate binding) application (.parameters binding))
                                              (extract request)))
-            scoped-params (map (fn[[k v]] (.resolve request-scope (custom-type (name k))))
+            scoped-params (map (fn[[k v]] (.resolve request-scope (custom-type k)))
                                (get-in (meta func) [:binding :scoped-params]))]
         (as-action-result
           (apply func (as-action-params (concat scoped-params request-params))))))))
@@ -149,7 +149,7 @@
       (doseq [param x]
         (.. application
             (applicationScope)
-            (addType (custom-type (name (:name param)))
+            (addType (custom-type (:name param))
                      (value-resolver (:value param))))))
     {:server (RestServer. application config)}))
 
