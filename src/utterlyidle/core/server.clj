@@ -68,9 +68,22 @@
 (defn- custom-type [name]
   (CustomType. name))
 
+(defn- merge-params [order request-params scoped-params]
+  (:all-params
+   (reduce
+     (fn [{:keys [scoped-params request-params all-params]} x]
+       (if (contains? scoped-params x) {:all-params     (conj all-params (scoped-params x))
+                                        :scoped-params  (dissoc scoped-params x)
+                                        :request-params request-params}
+                                       {:all-params     (conj all-params (first request-params))
+                                        :scoped-params  scoped-params
+                                        :request-params (rest request-params)}))
+     {:all-params [] :scoped-params scoped-params :request-params request-params}
+     order)))
+
 (defn- create-action []
   (reify Action
-    (description [this] "Clojure Binding")
+    (description [this] "Utterlyidle -> Clojure binding")
     (metaData [this] [])
     (invoke [this request-scope]
       (let [request (.get request-scope Request)
@@ -78,10 +91,13 @@
             binding (.. request-scope (get MatchedBinding) (value))
             [func & request-params] (seq (.. (ParametersExtractor. (.uriTemplate binding) application (.parameters binding))
                                              (extract request)))
-            scoped-params (map (fn[[k v]] (.resolve request-scope (custom-type k)))
-                               (get-in (meta func) [:binding :scoped-params]))]
+            scoped-params (into {} (map (fn [[k v]] [v (.resolve request-scope (custom-type k))])
+                                        (get-in (meta func) [:binding :scoped-params])))
+            arguments (first (get-in (meta func) [:binding :arguments]))
+            all-params (merge-params arguments request-params scoped-params)]
+
         (as-action-result
-          (apply func (as-action-params (concat scoped-params request-params))))))))
+          (apply func (as-action-params all-params)))))))
 
 (defn- dispatch-function-parameters [func params]
   (cons (Pair/pair IFn (Option/some (DefinedParameter. IFn func)))
@@ -163,6 +179,6 @@
   Use 'client' binding to query the server."
   [bindings & body]
   `(let [server# (apply start-server (cons {} (flatten [~bindings])))]
-     (binding [client-http-handler (fn[] (.application (:server server#)))]
+     (binding [client-http-handler (fn [] (.application (:server server#)))]
        (try ~@body
             (finally (stop-server server#))))))

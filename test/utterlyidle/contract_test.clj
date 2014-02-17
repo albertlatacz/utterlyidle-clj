@@ -77,13 +77,14 @@
          "GET Hello there")))
 
 (defresource binding-with-application-scoped [:get "/binding-with-application-scoped"]
-  {:scoped-params {:app-scoped-1 app-scoped-1
+  {:query-params [test]
+   :scoped-params {:app-scoped-1 app-scoped-1
                    :app-scoped-2 app-scoped-2}}
-  (str "GET SCOPED '" app-scoped-1 "' and '" app-scoped-2 "'"))
+  (str "GET SCOPED: " test " '" app-scoped-1 "' and '" app-scoped-2 "'"))
 
 (deftest supports-application-scoping
-  (is (= (-> (GET "/binding-with-application-scoped") (entity))
-         "GET SCOPED 'app scoped 1' and 'app scoped 2'")))
+  (is (= (-> (GET "/binding-with-application-scoped?test=Hello") (entity))
+         "GET SCOPED: Hello 'app scoped 1' and 'app scoped 2'")))
 
 (deftest supports-static-resources
   (is (= (-> (GET "/static/test.ping") (status-code))
